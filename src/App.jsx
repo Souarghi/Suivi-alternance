@@ -227,15 +227,24 @@ const App = () => {
     finally { setLoading(false); }
   };
 
-  const uploadFile = async (file) => {
+const uploadFile = async (file) => {
     if (!file) return null;
+
+    // --- SECURITE TAILLE FICHIER (Max 2 Mo) ---
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Le fichier est trop lourd ! (Max 2 Mo)");
+      return null;
+    }
     const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
     const { error } = await supabase.storage.from('documents').upload(fileName, file);
-    if (error) { alert("Erreur upload"); return null; }
+    if (error) { 
+      console.error("Erreur upload:", error);
+      alert("Erreur lors de l'upload. Vérifie ta connexion."); 
+      return null; 
+    }
     const { data } = supabase.storage.from('documents').getPublicUrl(fileName);
     return data.publicUrl;
   };
-
   const handleProfileUpload = async (file, type) => {
     if (!file) return;
     setUploading(true);
