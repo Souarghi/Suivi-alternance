@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { 
@@ -10,7 +11,6 @@ import {
 // 👇 REMETS TES CLÉS SUPABASE ICI
 const supabaseUrl = 'https://mvloohmnvggirpdfhotb.supabase.co';
 const supabaseKey = 'sb_publishable_fAGf692lpXVGI1YZgyx3Ew_Dz_tEEYO';
-
 
 // Sécurité
 const safeSupabase = () => {
@@ -112,7 +112,7 @@ const AuthScreen = ({ supabase }) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full text-center">
-        {/* LOGO PLACEHOLDER - Remplace '/logo.png' par ton fichier si tu l'as mis dans public */}
+        {/* LOGO PLACEHOLDER */}
         <img src="/logo.png" onError={(e) => e.target.style.display='none'} alt="Logo" className="w-20 h-20 mx-auto mb-4 rounded-xl object-contain"/>
         <h1 className="text-2xl font-bold mb-2 text-gray-800">Suivi Alternance</h1>
         <p className="text-gray-500 text-sm mb-6">{isSignUp ? "Créer un compte" : "Connexion à ton espace"}</p>
@@ -163,8 +163,13 @@ const App = () => {
       const { data: apps } = await supabase.from('applications').select('*');
       setApplications(apps || []);
       const { data: prof } = await supabase.from('profile').select('*').limit(1).maybeSingle();
-      if (prof) setProfile(prof);
-      else { const { data: new } = await supabase.from('profile').insert([{}]).select().single(); if(new) setProfile(new); }
+      if (prof) {
+        setProfile(prof);
+      } else { 
+        // ICI C'ETAIT L'ERREUR, J'AI REMPLACÉ 'new' par 'newProf'
+        const { data: newProf } = await supabase.from('profile').insert([{}]).select().single(); 
+        if(newProf) setProfile(newProf); 
+      }
     } catch (e) { console.error(e); } 
     finally { setLoading(false); }
   };
