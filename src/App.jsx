@@ -7,10 +7,10 @@ import {
   CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, Link as LinkIcon
 } from 'lucide-react';
 
-
 // 👇 REMETS TES CLÉS SUPABASE ICI
 const supabaseUrl = 'https://mvloohmnvggirpdfhotb.supabase.co';
 const supabaseKey = 'sb_publishable_fAGf692lpXVGI1YZgyx3Ew_Dz_tEEYO';
+
 
 // Sécurité
 const safeSupabase = () => {
@@ -39,30 +39,11 @@ const LegalModal = ({ onClose, onExport, onDeleteAccount }) => (
         <h2 className="text-xl font-bold text-[#0f1f41] flex items-center gap-2"><ShieldCheck className="text-blue-600"/> Données & Confidentialité (RGPD)</h2>
         <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full"><X size={24}/></button>
       </div>
-      
       <div className="space-y-6 text-sm text-gray-700">
-        <section>
-            <h3 className="font-bold text-lg mb-2 text-gray-900">1. Vos Droits</h3>
-            <p>Conformément au RGPD, vous disposez d'un droit d'accès, de portabilité et d'effacement de vos données.</p>
-        </section>
-
-        <section className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><Download size={16}/> Portabilité des données</h3>
-            <p className="mb-3">Vous pouvez télécharger l'intégralité de vos candidatures au format CSV (compatible Excel).</p>
-            <button onClick={onExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 flex items-center gap-2">Télécharger mes données (.csv)</button>
-        </section>
-
-        <section className="bg-red-50 p-4 rounded-lg border border-red-100">
-            <h3 className="font-bold text-red-900 mb-2 flex items-center gap-2"><Trash2 size={16}/> Zone de Danger : Suppression</h3>
-            <p className="mb-3">Cette action est <strong>irréversible</strong>. Elle supprimera votre compte et toutes vos candidatures.</p>
-            <button onClick={() => { if(window.confirm("ES-TU SÛR ? Tout sera effacé définitivement.")) onDeleteAccount(); }} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700">Supprimer mon compte</button>
-        </section>
-
-        <section className="text-xs text-gray-500 mt-4 border-t pt-4">
-            <p><strong>Éditeur :</strong> Sheryne OUARGHI-MHIRI (Projet Étudiant)</p>
-            <p><strong>Hébergement :</strong> Vercel Inc. / Supabase (Europe/USA)</p>
-            <p><strong>Contact :</strong> sheryne.ouarghi.pro@gmail.com</p>
-        </section>
+        <section><h3 className="font-bold text-lg mb-2 text-gray-900">1. Vos Droits</h3><p>Conformément au RGPD, vous disposez d'un droit d'accès, de portabilité et d'effacement de vos données.</p></section>
+        <section className="bg-blue-50 p-4 rounded-lg border border-blue-100"><h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><Download size={16}/> Portabilité</h3><p className="mb-3">Télécharger l'intégralité de vos candidatures au format CSV.</p><button onClick={onExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 flex items-center gap-2">Télécharger mes données (.csv)</button></section>
+        <section className="bg-red-50 p-4 rounded-lg border border-red-100"><h3 className="font-bold text-red-900 mb-2 flex items-center gap-2"><Trash2 size={16}/> Zone de Danger</h3><p className="mb-3">Action irréversible : suppression du compte et des données.</p><button onClick={() => { if(window.confirm("ES-TU SÛR ? Tout sera effacé définitivement.")) onDeleteAccount(); }} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700">Supprimer mon compte</button></section>
+        <section className="text-xs text-gray-500 mt-4 border-t pt-4"><p><strong>Éditeur :</strong> Sheryne OUARGHI-MHIRI (Projet Étudiant)</p><p><strong>Hébergement :</strong> Vercel Inc. / Supabase (Europe/USA)</p><p><strong>Contact :</strong> sheryne.ouarghi.pro@gmail.com</p></section>
       </div>
     </div>
   </div>
@@ -268,21 +249,16 @@ const App = () => {
     await supabase.from('applications').update({ isFavorite: newVal }).eq('id', app.id);
   };
 
-  // --- ACTIONS RGPD ---
   const exportToCSV = () => {
     const headers = ["Entreprise", "Poste", "Statut", "Source", "Lien/Email", "Date", "Relance Faite"];
-    const rows = applications.map(app => [
-        `"${app.company}"`, `"${app.role}"`, `"${app.status}"`, `"${app.source}"`, 
-        `"${app.application_url || app.contact_email || ''}"`, `"${app.date}"`, `"${app.relanceDone ? 'Oui' : 'Non'}"`
-    ]);
+    const rows = applications.map(app => [`"${app.company}"`, `"${app.role}"`, `"${app.status}"`, `"${app.source}"`, `"${app.application_url || app.contact_email || ''}"`, `"${app.date}"`, `"${app.relanceDone ? 'Oui' : 'Non'}"`]);
     const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
     const link = document.createElement("a"); link.href = encodeURI(csvContent); link.download = "mes_candidatures.csv"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
   const deleteAccountData = async () => {
-    // Suppression des données (la ligne User Auth restera mais les données seront vides)
     setLoading(true);
-    await supabase.from('applications').delete().neq('id', 0); // Supprime tout
+    await supabase.from('applications').delete().neq('id', 0);
     await supabase.from('profile').delete().neq('id', 0);
     await supabase.auth.signOut();
     setSession(null);
@@ -294,9 +270,17 @@ const App = () => {
   const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], lm_url: "", relanceDone: false, isFavorite: false }); setFileLM(null); setEditingId(null); };
   const calculateRelance = (d) => { if (!d) return "-"; const date = new Date(d); date.setDate(date.getDate() + 15); return date.toLocaleDateString('fr-FR'); };
 
+  // --- LOGIQUE TRI & AUTO-COMPLETION ---
+  const uniqueCompanies = [...new Set(applications.map(a => a.company))];
+  const uniqueLocations = [...new Set(applications.map(a => a.location))];
+
   const filteredApps = applications
     .filter(a => a.company?.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => sortType === 'alpha' ? a.company.localeCompare(b.company) : new Date(b.date) - new Date(a.date));
+    .sort((a, b) => {
+        if (sortType === 'favorite') return (b.isFavorite === true) - (a.isFavorite === true);
+        if (sortType === 'alpha') return a.company.localeCompare(b.company);
+        return new Date(b.date) - new Date(a.date);
+    });
 
   if (!supabase) return <div className="p-10 text-red-600 text-center">Clés manquantes</div>;
   if (!session) return <AuthScreen supabase={supabase} />;
@@ -324,27 +308,37 @@ const App = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="space-y-6">
-            {/* DOCS */}
+            
+            {/* DOCS STATIQUES */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                <h2 className="font-bold flex items-center gap-2 mb-4 text-[#0f1f41]"><FileCheck className="text-[#005792]"/> Mes Documents</h2>
                <div className="space-y-3">
-                  {['ats', 'human'].map(type => (
-                    <div key={type} className="relative group">
-                        <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.[`cv_${type}`] ? 'border-[#00ab65] bg-green-50' : 'border-dashed border-gray-300 hover:border-[#005792] hover:bg-blue-50'}`}>
-                          <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-full ${profile?.[`cv_${type}`] ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>{type === 'ats' ? <FileText size={18}/> : <User size={18}/>}</div>
-                            <div><span className="text-sm font-bold text-gray-700 block">{type === 'ats' ? 'CV ATS' : 'CV Design'}</span><span className="text-[10px] text-gray-400">{profile?.[`cv_${type}`] ? "Chargé" : "PDF"}</span></div>
-                          </div>
-                          <Upload size={16} className="text-gray-400"/>
-                          <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], type)} disabled={uploading}/>
-                        </label>
-                        {profile?.[`cv_${type}`] && <a href={profile[`cv_${type}`]} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#00ab65] hover:underline z-10">Voir</a>}
-                    </div>
-                  ))}
+                  <div className="relative group">
+                    <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.cv_ats ? 'border-[#00ab65] bg-green-50' : 'border-dashed border-gray-300 hover:border-[#005792] hover:bg-blue-50'}`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-full ${profile?.cv_ats ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}><FileText size={18}/></div>
+                        <div><span className="text-sm font-bold text-gray-700 block">CV ATS</span><span className="text-[10px] text-gray-400">{profile?.cv_ats ? "Chargé" : "PDF"}</span></div>
+                      </div>
+                      <Upload size={16} className="text-gray-400"/>
+                      <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'ats')} disabled={uploading}/>
+                    </label>
+                    {profile?.cv_ats && <a href={profile.cv_ats} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#00ab65] hover:underline z-10">Voir</a>}
+                  </div>
+                  <div className="relative group">
+                    <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.cv_human ? 'border-[#005792] bg-blue-50' : 'border-dashed border-gray-300 hover:border-[#fdbb2d] hover:bg-yellow-50'}`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-full ${profile?.cv_human ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}><User size={18}/></div>
+                        <div><span className="text-sm font-bold text-gray-700 block">CV Design</span><span className="text-[10px] text-gray-400">{profile?.cv_human ? "Chargé" : "PDF"}</span></div>
+                      </div>
+                      <Upload size={16} className="text-gray-400"/>
+                      <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'human')} disabled={uploading}/>
+                    </label>
+                    {profile?.cv_human && <a href={profile.cv_human} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#005792] hover:underline z-10">Voir</a>}
+                  </div>
                </div>
             </div>
 
-            {/* FORMULAIRE INTELLIGENT */}
+            {/* FORMULAIRE AVEC AUTO-COMPLETE */}
             <div className={`bg-white p-5 rounded-xl shadow-sm border border-gray-200 ${editingId ? 'ring-2 ring-orange-200' : ''}`}>
                <div className="flex justify-between items-center mb-4">
                  <h2 className="font-bold text-[#0f1f41]">{editingId ? "Modifier" : "Nouvelle Candidature"}</h2>
@@ -352,7 +346,11 @@ const App = () => {
                </div>
                
                <form onSubmit={handleSubmit} className="space-y-3">
-                  <input placeholder="Entreprise (ex: Thales)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" value={newApp.company} onChange={e=>setNewApp({...newApp, company: e.target.value})} required/>
+                  {/* Datalists pour auto-complétion */}
+                  <datalist id="companies">{uniqueCompanies.map(c => <option key={c} value={c}/>)}</datalist>
+                  <datalist id="locations">{uniqueLocations.map(l => <option key={l} value={l}/>)}</datalist>
+
+                  <input list="companies" placeholder="Entreprise (ex: Thales)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" value={newApp.company} onChange={e=>setNewApp({...newApp, company: e.target.value})} required/>
                   <input placeholder="Poste (ex: Data Analyst)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" value={newApp.role} onChange={e=>setNewApp({...newApp, role: e.target.value})} required/>
                   
                   <div className="grid grid-cols-2 gap-3">
@@ -360,11 +358,10 @@ const App = () => {
                     <select className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.status} onChange={e=>setNewApp({...newApp, status: e.target.value})}>{statusOptions.map(s=><option key={s} value={s}>{s}</option>)}</select>
                   </div>
 
-                  {/* LOGIQUE CONTACT VS LIEN */}
                   {newApp.source === 'Contact direct' ? (
                      <div className="bg-blue-50 p-3 rounded-lg space-y-2 border border-blue-100">
                         <p className="text-xs font-bold text-blue-800 uppercase">Contact Direct</p>
-                        <input placeholder="Nom Prénom" className="w-full border p-2 rounded text-sm" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
+                        <input list="locations" placeholder="Ville" className="w-full border p-2 rounded text-sm bg-white" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
                         <input placeholder="Email du contact" className="w-full border p-2 rounded text-sm" value={newApp.contact_email} onChange={e=>setNewApp({...newApp, contact_email: e.target.value})} />
                         <input type="date" className="w-full border p-2 rounded text-sm" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
                      </div>
@@ -372,7 +369,7 @@ const App = () => {
                      <div className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                            <input type="date" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
-                           <input placeholder="Lieu" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
+                           <input list="locations" placeholder="Ville" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
                         </div>
                         <div className="relative">
                             <LinkIcon className="absolute left-3 top-2.5 text-gray-400" size={16}/>
@@ -403,7 +400,11 @@ const App = () => {
                    <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
                    <input placeholder="Rechercher..." className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)}/>
                 </div>
-                <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white cursor-pointer"><option value="date">📅 Date</option><option value="alpha">🔤 Alphabétique</option></select>
+                <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white cursor-pointer">
+                    <option value="favorite">❤️ Favoris</option>
+                    <option value="date">📅 Date (Récent)</option>
+                    <option value="alpha">🔤 Alphabétique</option>
+                </select>
              </div>
 
              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px]">
@@ -421,11 +422,14 @@ const App = () => {
                               <td className="p-4 text-gray-600">{app.role}</td>
                               <td className="p-4"><span className={`px-2 py-1 rounded-full text-xs font-medium border ${app.status==='Postulé'?'bg-blue-50 border-blue-200 text-blue-700':app.status==='Refusé'?'bg-red-50 border-red-200 text-red-700':app.status==='Accepté'?'bg-green-50 border-green-200 text-green-700':'bg-gray-50 border-gray-200'}`}>{app.status}</span></td>
                               <td className="p-4">
-                                {app.source === 'Contact direct' ? (
-                                    <div className="flex flex-col text-xs"><span className="font-bold text-gray-700">{app.location}</span><a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1"><Mail size={10}/> {app.contact_email || "-"}</a></div>
-                                ) : (
-                                    app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1 w-fit hover:bg-blue-100 text-xs font-bold"><ExternalLink size={10}/> Voir l'annonce</a> : <span className="text-gray-400 text-xs">-</span>
-                                )}
+                                <div className="flex flex-col text-xs">
+                                   {app.location && <span className="font-bold text-gray-700 mb-1 flex items-center gap-1"><MapPin size={10}/> {app.location}</span>}
+                                   {app.source === 'Contact direct' ? (
+                                      app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1"><Mail size={10}/> {app.contact_email}</a> : null
+                                   ) : (
+                                      app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1 w-fit hover:bg-blue-100 text-xs font-bold"><ExternalLink size={10}/> Annonce</a> : null
+                                   )}
+                                </div>
                               </td>
                               <td className="p-4 text-center"><span className={`text-xs font-bold px-2 py-1 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 line-through opacity-50' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span></td>
                               <td className="p-4 text-center"><input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600 rounded"/></td>
