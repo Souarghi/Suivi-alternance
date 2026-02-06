@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { 
   Plus, Trash2, Briefcase, Building2, MapPin, Calendar, CheckSquare, 
@@ -105,8 +105,6 @@ const AuthScreen = ({ supabase }) => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col md:flex-row font-sans">
-      
-      {/* GAUCHE : PRÉSENTATION */}
       <div className="md:w-1/2 bg-[#0f1f41] text-white p-8 md:p-12 flex flex-col justify-between">
         <div>
             <div className="flex items-center gap-3 mb-8">
@@ -116,66 +114,32 @@ const AuthScreen = ({ supabase }) => {
                 </div>
                 <span className="text-2xl font-bold tracking-tight">Suivi Alternance</span>
             </div>
-            
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
-                Ne perdez plus le fil de vos <span className="text-[#4dabf7]">candidatures</span>.
-            </h1>
-            
-            <p className="text-gray-300 text-lg mb-8 leading-relaxed">
-                Une application conçue par <strong>Sheryne OUARGHI-MHIRI</strong> pour aider les étudiants à structurer leur recherche d'emploi. Centralisez, relancez, décrochez votre alternance.
-            </p>
-
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">Ne perdez plus le fil de vos <span className="text-[#4dabf7]">candidatures</span>.</h1>
+            <p className="text-gray-300 text-lg mb-8 leading-relaxed">Une application conçue par <strong>Sheryne OUARGHI-MHIRI</strong> pour aider les étudiants à structurer leur recherche d'emploi. Centralisez, relancez, décrochez votre alternance.</p>
             <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <div className="bg-blue-500/20 p-2 rounded-lg"><Check size={20} className="text-blue-400"/></div>
-                    <span>Tableau de bord intelligent & Relances J+15</span>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="bg-purple-500/20 p-2 rounded-lg"><Upload size={20} className="text-purple-400"/></div>
-                    <span>Stockage centralisé de vos CVs (ATS & Design)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="bg-green-500/20 p-2 rounded-lg"><ShieldCheck size={20} className="text-green-400"/></div>
-                    <span>100% Sécurisé & Conforme RGPD</span>
-                </div>
+                <div className="flex items-center gap-3"><div className="bg-blue-500/20 p-2 rounded-lg"><Check size={20} className="text-blue-400"/></div><span>Tableau de bord intelligent & Relances J+15</span></div>
+                <div className="flex items-center gap-3"><div className="bg-purple-500/20 p-2 rounded-lg"><Upload size={20} className="text-purple-400"/></div><span>Stockage centralisé de vos CVs (ATS & Design)</span></div>
+                <div className="flex items-center gap-3"><div className="bg-green-500/20 p-2 rounded-lg"><ShieldCheck size={20} className="text-green-400"/></div><span>100% Sécurisé & Conforme RGPD</span></div>
             </div>
         </div>
-
         <div className="mt-12 md:mt-0 pt-6 border-t border-gray-700">
-            <button onClick={() => setShowLegal(true)} className="text-sm text-gray-400 hover:text-white underline transition-colors">
-                Mentions Légales & Politique de Confidentialité
-            </button>
+            <button onClick={() => setShowLegal(true)} className="text-sm text-gray-400 hover:text-white underline transition-colors">Mentions Légales & Politique de Confidentialité</button>
             <p className="text-xs text-gray-500 mt-2">© 2026 - Projet Étudiant</p>
         </div>
       </div>
-
-      {/* DROITE : CONNEXION */}
       <div className="md:w-1/2 bg-gray-50 flex items-center justify-center p-6">
         <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-gray-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">{isSignUp ? "Créer un compte" : "Bon retour !"}</h2>
             <p className="text-center text-gray-500 text-sm mb-6">Connectez-vous pour accéder à votre espace.</p>
-            
             <form onSubmit={handleAuth} className="space-y-4">
-                <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Email Étudiant / Perso</label>
-                    <input type="email" placeholder="exemple@ecole.fr" className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={email} onChange={e => setEmail(e.target.value)} required />
-                </div>
-                <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Mot de passe</label>
-                    <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={password} onChange={e => setPassword(e.target.value)} required />
-                </div>
+                <div><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Email Étudiant / Perso</label><input type="email" placeholder="exemple@ecole.fr" className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={email} onChange={e => setEmail(e.target.value)} required /></div>
+                <div><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Mot de passe</label><input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={password} onChange={e => setPassword(e.target.value)} required /></div>
                 <button disabled={loading} className="w-full bg-[#005792] hover:bg-[#004270] text-white font-bold py-3 rounded-lg transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">{loading ? 'Chargement...' : (isSignUp ? "Commencer l'aventure" : "Se connecter")}</button>
             </form>
-            
             {message && <div className="mt-4 p-3 bg-blue-50 text-blue-700 text-sm rounded-lg text-center font-medium">{message}</div>}
-            
-            <div className="mt-6 text-center border-t pt-4">
-                <p className="text-sm text-gray-600 mb-2">{isSignUp ? "Déjà un compte ?" : "Pas encore inscrit ?"}</p>
-                <button onClick={() => setIsSignUp(!isSignUp)} className="text-sm text-[#005792] font-bold hover:underline">{isSignUp ? "Se connecter" : "Créer un compte gratuitement"}</button>
-            </div>
+            <div className="mt-6 text-center border-t pt-4"><p className="text-sm text-gray-600 mb-2">{isSignUp ? "Déjà un compte ?" : "Pas encore inscrit ?"}</p><button onClick={() => setIsSignUp(!isSignUp)} className="text-sm text-[#005792] font-bold hover:underline">{isSignUp ? "Se connecter" : "Créer un compte gratuitement"}</button></div>
         </div>
       </div>
-
       {showLegal && <LegalModal onClose={() => setShowLegal(false)} isAuthScreen={true} />}
     </div>
   );
@@ -189,16 +153,19 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [showLegal, setShowLegal] = useState(false);
   
+  // UI States
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortType, setSortType] = useState("date");
+  const [sortType, setSortType] = useState("date_desc"); // Par défaut : récent en premier
   const [viewMode, setViewMode] = useState("list"); 
   const [editingId, setEditingId] = useState(null);
-  const [fileLM, setFileLM] = useState(null);
   const [uploading, setUploading] = useState(false);
   
+  // REF POUR LE SCROLL
+  const formRef = useRef(null);
+
   const [newApp, setNewApp] = useState({ 
     company: "", role: "", status: "A faire", location: "", source: "LinkedIn", 
-    contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], relanceDone: false, lm_url: "", isFavorite: false
+    contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], relanceDone: false, isFavorite: false
   });
 
   const statusOptions = ["A faire", "Postulé", "Entretien", "Accepté", "Refusé"];
@@ -227,24 +194,16 @@ const App = () => {
     finally { setLoading(false); }
   };
 
-const uploadFile = async (file) => {
+  const uploadFile = async (file) => {
     if (!file) return null;
-
-    // --- SECURITE TAILLE FICHIER (Max 2 Mo) ---
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Le fichier est trop lourd ! (Max 2 Mo)");
-      return null;
-    }
+    if (file.size > 2 * 1024 * 1024) { alert("Le fichier est trop lourd ! (Max 2 Mo)"); return null; }
     const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
     const { error } = await supabase.storage.from('documents').upload(fileName, file);
-    if (error) { 
-      console.error("Erreur upload:", error);
-      alert("Erreur lors de l'upload. Vérifie ta connexion."); 
-      return null; 
-    }
+    if (error) { alert("Erreur upload"); return null; }
     const { data } = supabase.storage.from('documents').getPublicUrl(fileName);
     return data.publicUrl;
   };
+
   const handleProfileUpload = async (file, type) => {
     if (!file) return;
     setUploading(true);
@@ -264,9 +223,7 @@ const uploadFile = async (file) => {
     if (isDuplicate && !editingId) return alert("Attention : Doublon détecté !");
     
     setUploading(true);
-    let url = newApp.lm_url;
-    if (fileLM) { const u = await uploadFile(fileLM); if(u) url = u; }
-    const appData = { ...newApp, lm_url: url };
+    const appData = { ...newApp }; // Plus de lm_url ici
     
     if (editingId) {
       await supabase.from('applications').update(appData).eq('id', editingId);
@@ -298,6 +255,14 @@ const uploadFile = async (file) => {
     await supabase.from('applications').update({ isFavorite: newVal }).eq('id', app.id);
   };
 
+  // Fonction pour éditer ET remonter en haut
+  const handleEdit = (app) => {
+      setNewApp(app);
+      setEditingId(app.id);
+      // SCROLL SMOOTH VERS LE FORMULAIRE
+      formRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const exportToCSV = () => {
     const headers = ["Entreprise", "Poste", "Statut", "Source", "Lien/Email", "Date", "Relance Faite"];
     const rows = applications.map(app => [`"${app.company}"`, `"${app.role}"`, `"${app.status}"`, `"${app.source}"`, `"${app.application_url || app.contact_email || ''}"`, `"${app.date}"`, `"${app.relanceDone ? 'Oui' : 'Non'}"`]);
@@ -316,18 +281,20 @@ const uploadFile = async (file) => {
     alert("Compte et données supprimés.");
   };
 
-  const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], lm_url: "", relanceDone: false, isFavorite: false }); setFileLM(null); setEditingId(null); };
+  const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], relanceDone: false, isFavorite: false }); setEditingId(null); };
   const calculateRelance = (d) => { if (!d) return "-"; const date = new Date(d); date.setDate(date.getDate() + 15); return date.toLocaleDateString('fr-FR'); };
 
   const uniqueCompanies = [...new Set(applications.map(a => a.company))];
   const uniqueLocations = [...new Set(applications.map(a => a.location))];
 
+  // LOGIQUE DE TRI
   const filteredApps = applications
     .filter(a => a.company?.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a, b) => {
         if (sortType === 'favorite') return (b.isFavorite === true) - (a.isFavorite === true);
         if (sortType === 'alpha') return a.company.localeCompare(b.company);
-        return new Date(b.date) - new Date(a.date);
+        if (sortType === 'date_asc') return new Date(a.date) - new Date(b.date); // Plus ancien en premier
+        return new Date(b.date) - new Date(a.date); // Par défaut : récent en premier (date_desc)
     });
 
   // --- COMPOSANT ROUTINE ---
@@ -373,7 +340,7 @@ const uploadFile = async (file) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="space-y-6">
             
-            {/* DOCS */}
+            {/* DOCS AVEC CHANGEMENT EXPLICITE */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                <h2 className="font-bold flex items-center gap-2 mb-4 text-[#0f1f41]"><FileCheck className="text-[#005792]"/> Mes Documents</h2>
                <div className="space-y-3">
@@ -396,12 +363,13 @@ const uploadFile = async (file) => {
                </div>
             </div>
 
-            {/* FORMULAIRE */}
-            <div className={`bg-white p-5 rounded-xl shadow-sm border border-gray-200 ${editingId ? 'ring-2 ring-orange-200' : ''}`}>
+            {/* FORMULAIRE AVEC AUTO-COMPLETE ET REF POUR SCROLL */}
+            <div ref={formRef} className={`bg-white p-5 rounded-xl shadow-sm border border-gray-200 ${editingId ? 'ring-2 ring-orange-200' : ''}`}>
                <div className="flex justify-between items-center mb-4">
                  <h2 className="font-bold text-[#0f1f41]">{editingId ? "Modifier" : "Nouvelle Candidature"}</h2>
                  {editingId && <button onClick={resetForm}><X size={16}/></button>}
                </div>
+               
                <form onSubmit={handleSubmit} className="space-y-3">
                   <datalist id="companies">{uniqueCompanies.map(c => <option key={c} value={c}/>)}</datalist>
                   <datalist id="locations">{uniqueLocations.map(l => <option key={l} value={l}/>)}</datalist>
@@ -433,11 +401,10 @@ const uploadFile = async (file) => {
                         </div>
                      </div>
                   )}
-                  <label className="flex items-center gap-2 cursor-pointer bg-gray-50 border border-dashed border-gray-300 p-2 rounded-lg text-xs text-gray-500 hover:bg-gray-100">
-                     <FileText size={14}/> {newApp.lm_url ? "Lettre jointe (Changer)" : "Joindre Lettre de motiv'"}
-                     <input type="file" className="hidden" onChange={(e) => setFileLM(e.target.files[0])} />
-                  </label>
-                  <button disabled={uploading} className={`w-full py-2.5 rounded-lg text-white font-bold text-sm shadow-md transition-transform active:scale-95 ${editingId ? 'bg-orange-500' : 'bg-[#005792] hover:bg-[#004270]'}`}>{uploading ? "..." : (editingId ? "Sauvegarder" : "Ajouter la candidature")}</button>
+                  
+                  <button disabled={uploading} className={`w-full py-2.5 rounded-lg text-white font-bold text-sm shadow-md transition-transform active:scale-95 ${editingId ? 'bg-orange-500' : 'bg-[#005792] hover:bg-[#004270]'}`}>
+                    {uploading ? "..." : (editingId ? "Sauvegarder" : "Ajouter la candidature")}
+                  </button>
                </form>
             </div>
           </div>
@@ -452,7 +419,12 @@ const uploadFile = async (file) => {
                    <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
                    <input placeholder="Rechercher..." className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)}/>
                 </div>
-                <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white cursor-pointer"><option value="favorite">❤️ Favoris</option><option value="date">📅 Date (Récent)</option><option value="alpha">🔤 Alphabétique</option></select>
+                <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white cursor-pointer">
+                    <option value="favorite">❤️ Favoris</option>
+                    <option value="date_desc">📅 Date (Récent -> Ancien)</option>
+                    <option value="date_asc">📅 Date (Ancien -> Récent)</option>
+                    <option value="alpha">🔤 Alphabétique</option>
+                </select>
              </div>
 
              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px]">
@@ -472,12 +444,16 @@ const uploadFile = async (file) => {
                               <td className="p-4">
                                 <div className="flex flex-col text-xs">
                                    {app.location && <span className="font-bold text-gray-700 mb-1 flex items-center gap-1"><MapPin size={10}/> {app.location}</span>}
-                                   {app.source === 'Contact direct' ? (app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1"><Mail size={10}/> {app.contact_email}</a> : null) : (app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1 w-fit hover:bg-blue-100 text-xs font-bold"><ExternalLink size={10}/> Annonce</a> : null)}
+                                   {app.source === 'Contact direct' ? (
+                                      app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1"><Mail size={10}/> {app.contact_email}</a> : null
+                                   ) : (
+                                      app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1 w-fit hover:bg-blue-100 text-xs font-bold"><ExternalLink size={10}/> Annonce</a> : null
+                                   )}
                                 </div>
                               </td>
                               <td className="p-4 text-center"><span className={`text-xs font-bold px-2 py-1 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 line-through opacity-50' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span></td>
                               <td className="p-4 text-center"><input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600 rounded"/></td>
-                              <td className="p-4 text-right"><button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={16}/></button><button onClick={()=>{setNewApp(app); setEditingId(app.id);}} className="text-gray-300 hover:text-blue-500 p-1"><Pencil size={16}/></button></td>
+                              <td className="p-4 text-right"><button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={16}/></button><button onClick={()=>handleEdit(app)} className="text-gray-300 hover:text-blue-500 p-1"><Pencil size={16}/></button></td>
                            </tr>
                          ))}
                        </tbody>
@@ -491,8 +467,11 @@ const uploadFile = async (file) => {
                            <h3 className="font-bold text-xs uppercase text-gray-500 mb-3 flex justify-between">{status} <span className="bg-white border px-1.5 rounded text-gray-400">{filteredApps.filter(a=>a.status===status).length}</span></h3>
                            <div className="flex flex-col gap-2">
                              {filteredApps.filter(a=>a.status===status).map(app => (
-                               <div key={app.id} className={`bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${app.relanceDone ? 'opacity-60 grayscale' : ''}`} onClick={()=>{setNewApp(app); setEditingId(app.id);}}>
-                                  <div className="flex justify-between items-start"><div className="font-bold text-[#0f1f41]">{app.company}</div><button onClick={(e)=>{e.stopPropagation(); toggleFavorite(app);}}><Heart size={14} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button></div>
+                               <div key={app.id} className={`bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${app.relanceDone ? 'opacity-60 grayscale' : ''}`} onClick={()=>handleEdit(app)}>
+                                  <div className="flex justify-between items-start">
+                                      <div className="font-bold text-[#0f1f41]">{app.company}</div>
+                                      <button onClick={(e)=>{e.stopPropagation(); toggleFavorite(app);}}><Heart size={14} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button>
+                                  </div>
                                   <div className="text-xs text-gray-500 mb-2">{app.role}</div>
                                   <div className="flex justify-between items-end"><div className="text-[10px] text-gray-400 bg-gray-50 inline-block px-1.5 py-0.5 rounded">J+15: {calculateRelance(app.date)}</div>{app.relanceDone && <CheckCircle size={14} className="text-green-500"/>}</div>
                                </div>
@@ -513,7 +492,7 @@ const uploadFile = async (file) => {
         <button onClick={() => setShowLegal(true)} className="text-xs text-gray-400 hover:text-gray-600 underline">Mentions Légales & RGPD</button>
       </footer>
 
-      {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={exportToCSV} onDeleteAccount={deleteAccountData} isAuthScreen={false} />}
+      {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={exportToCSV} onDeleteAccount={deleteAccountData} />}
     </div>
   );
 };
