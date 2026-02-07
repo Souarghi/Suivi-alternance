@@ -57,7 +57,7 @@ const DailyRoutine = () => {
         <div className="text-sm font-bold text-gray-500">{progress}%</div>
       </div>
       
-      {/* BARRE DE PROGRESSION AJOUTÉE ICI */}
+      {/* BARRE DE PROGRESSION */}
       <div className="w-full bg-gray-100 rounded-full h-2.5 mb-5 overflow-hidden">
         <div 
             className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out" 
@@ -139,30 +139,35 @@ const LegalModal = ({ onClose, onExport, onDeleteAccount, isAuthScreen }) => (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
     <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
       <div className="flex justify-between items-center mb-6 border-b pb-4">
-        <h2 className="text-xl font-bold text-[#0f1f41] flex items-center gap-2"><ShieldCheck className="text-blue-600"/> Données & Confidentialité (RGPD)</h2>
+        <h2 className="text-xl font-bold text-[#0f1f41] flex items-center gap-2"><ShieldCheck className="text-blue-600"/> Mentions Légales & RGPD</h2>
         <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full"><X size={24}/></button>
       </div>
       <div className="space-y-6 text-sm text-gray-700">
         <section>
-            <h3 className="font-bold text-lg mb-2 text-gray-900">1. Présentation & Objectif</h3>
-            <p><strong>Suivi Alternance</strong> est une application développée par <strong>Sheryne OUARGHI-MHIRI</strong>.</p>
+            <h3 className="font-bold text-lg mb-2 text-gray-900">1. Éditeur & Contact</h3>
+            <p><strong>Développement :</strong> Sheryne OUARGHI-MHIRI</p>
+            <p><strong>Contact :</strong> <a href="mailto:sheryne.ouarghi.pro@gmail.com" className="text-blue-600 hover:underline font-medium">sheryne.ouarghi.pro@gmail.com</a></p>
+            <p className="mt-2 text-gray-500 italic text-xs">Certaines idées et fonctionnalités sont inspirées par <strong>Myriam Bensaïd</strong>.</p>
         </section>
+        
         <section>
             <h3 className="font-bold text-lg mb-2 text-gray-900">2. Vos Droits (RGPD)</h3>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li><strong>Droit à l'oubli :</strong> Suppression totale possible à tout moment.</li>
-                <li><strong>Portabilité :</strong> Export CSV disponible.</li>
+                <li><strong>Droit à l'oubli :</strong> Vous pouvez supprimer votre compte et toutes vos données à tout moment.</li>
+                <li><strong>Portabilité :</strong> Vous pouvez exporter vos données au format CSV.</li>
+                <li><strong>Hébergement :</strong> Les données sont sécurisées via Supabase.</li>
             </ul>
         </section>
+
         {!isAuthScreen && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
                 <section className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                     <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><Download size={16}/> Portabilité</h3>
-                    <button onClick={onExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 text-xs w-full">Télécharger (.csv)</button>
+                    <button onClick={onExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 text-xs w-full transition-colors">Télécharger mes données (.csv)</button>
                 </section>
                 <section className="bg-red-50 p-4 rounded-lg border border-red-100">
                     <h3 className="font-bold text-red-900 mb-2 flex items-center gap-2"><Trash2 size={16}/> Zone de Danger</h3>
-                    <button onClick={() => { if(window.confirm("Tout sera effacé définitivement ?")) onDeleteAccount(); }} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700 text-xs w-full">Supprimer mon compte</button>
+                    <button onClick={() => { if(window.confirm("Attention : Cette action est irréversible. Toutes vos candidatures seront effacées. Continuer ?")) onDeleteAccount(); }} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700 text-xs w-full transition-colors">Supprimer mon compte</button>
                 </section>
             </div>
         )}
@@ -194,31 +199,78 @@ const AuthScreen = ({ supabase }) => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col md:flex-row font-sans">
-      <div className="md:w-1/2 bg-[#0f1f41] text-white p-8 md:p-12 flex flex-col justify-between">
-        <div>
-            <div className="flex items-center gap-3 mb-8">
-                <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center p-2 overflow-hidden relative">
+      {/* Côté Gauche : Présentation */}
+      <div className="md:w-1/2 bg-[#0f1f41] text-white p-8 md:p-12 flex flex-col justify-between relative overflow-hidden">
+        {/* Cercles déco arrière-plan */}
+        <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+
+        <div className="z-10">
+            <div className="flex items-center gap-3 mb-10">
+                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-2 overflow-hidden relative shadow-lg">
                     <img src="/logo.png" onError={(e) => {e.target.style.display='none';}} alt="Logo" className="w-full h-full object-contain z-10"/>
-                    <Briefcase className="text-[#0f1f41] absolute opacity-20" size={32}/>
+                    <Briefcase className="text-[#0f1f41] absolute opacity-20" size={28}/>
                 </div>
-                <span className="text-3xl font-bold tracking-tight">Suivi Alternance</span>
+                <span className="text-2xl font-bold tracking-tight">Suivi Alternance</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">Ne perdez plus le fil de vos <span className="text-[#4dabf7]">candidatures</span>.</h1>
-            <p className="text-gray-300 text-lg mb-8 leading-relaxed">Centralisez, relancez, décrochez votre alternance.</p>
+            
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-8 leading-tight">
+                Ne perdez plus le fil de vos <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4dabf7] to-purple-400">candidatures</span>.
+            </h1>
+            
+            <div className="space-y-6 text-gray-300 text-lg">
+                <div className="flex items-start gap-4">
+                    <div className="bg-blue-500/20 p-2 rounded-lg mt-1"><CheckSquare size={20} className="text-blue-400"/></div>
+                    <p>Centralisez toutes vos offres (LinkedIn, Indeed, etc.) au même endroit.</p>
+                </div>
+                <div className="flex items-start gap-4">
+                    <div className="bg-purple-500/20 p-2 rounded-lg mt-1"><RefreshCw size={20} className="text-purple-400"/></div>
+                    <p>Gérez vos relances et votre routine de recherche quotidienne.</p>
+                </div>
+            </div>
         </div>
-        <div className="mt-12 md:mt-0 pt-6 border-t border-gray-700">
-            <button onClick={() => setShowLegal(true)} className="text-sm text-gray-400 hover:text-white underline transition-colors">Mentions Légales & RGPD</button>
+
+        <div className="mt-12 md:mt-0 pt-6 border-t border-gray-700 z-10">
+            <button onClick={() => setShowLegal(true)} className="text-sm text-gray-400 hover:text-white underline transition-colors flex items-center gap-2">
+                <ShieldCheck size={16}/> Mentions Légales & RGPD
+            </button>
         </div>
       </div>
+
+      {/* Côté Droit : Formulaire */}
       <div className="md:w-1/2 bg-gray-50 flex items-center justify-center p-6">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{isSignUp ? "Créer un compte" : "Bon retour !"}</h2>
-            <form onSubmit={handleAuth} className="space-y-4">
-                <div><label className="block text-sm font-bold text-gray-500 uppercase mb-1">Email</label><input type="email" className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-base" value={email} onChange={e => setEmail(e.target.value)} required /></div>
-                <div><label className="block text-sm font-bold text-gray-500 uppercase mb-1">Mot de passe</label><input type="password" className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-base" value={password} onChange={e => setPassword(e.target.value)} required /></div>
-                <button disabled={loading} className="w-full bg-[#005792] hover:bg-[#004270] text-white font-bold py-3.5 rounded-lg transition-all text-base">{loading ? 'Chargement...' : (isSignUp ? "S'inscrire" : "Se connecter")}</button>
+        <div className="bg-white p-8 md:p-10 rounded-2xl shadow-xl max-w-sm w-full border border-gray-100">
+            <div className="mb-8 text-center">
+                <h2 className="text-2xl font-bold text-gray-800">{isSignUp ? "Créer un compte" : "Bon retour !"}</h2>
+                <p className="text-gray-500 text-sm mt-2">{isSignUp ? "Commencez votre recherche organisée." : "Connectez-vous pour voir vos tableaux."}</p>
+            </div>
+
+            {message && (
+                <div className={`mb-4 p-3 rounded-lg text-sm text-center ${message.includes('créé') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                    {message}
+                </div>
+            )}
+
+            <form onSubmit={handleAuth} className="space-y-5">
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Email</label>
+                    <input type="email" className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-base" placeholder="exemple@email.com" value={email} onChange={e => setEmail(e.target.value)} required />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Mot de passe</label>
+                    <input type="password" className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-base" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
+                </div>
+                <button disabled={loading} className="w-full bg-[#005792] hover:bg-[#004270] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/10 text-base flex justify-center items-center gap-2">
+                    {loading ? <RefreshCw className="animate-spin" size={20}/> : (isSignUp ? "S'inscrire gratuitement" : "Se connecter")}
+                </button>
             </form>
-            <div className="mt-6 text-center pt-4"><button onClick={() => setIsSignUp(!isSignUp)} className="text-sm text-[#005792] font-bold hover:underline">{isSignUp ? "Déjà un compte ? Connexion" : "Créer un compte gratuitement"}</button></div>
+            
+            <div className="mt-8 text-center pt-6 border-t border-gray-100">
+                <p className="text-gray-500 text-sm mb-2">{isSignUp ? "Déjà membre ?" : "Pas encore de compte ?"}</p>
+                <button onClick={() => setIsSignUp(!isSignUp)} className="text-blue-600 font-bold hover:underline transition-all">
+                    {isSignUp ? "Se connecter" : "Créer un compte"}
+                </button>
+            </div>
         </div>
       </div>
       {showLegal && <LegalModal onClose={() => setShowLegal(false)} isAuthScreen={true} />}
