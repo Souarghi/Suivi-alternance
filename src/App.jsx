@@ -52,10 +52,19 @@ const DailyRoutine = () => {
 
   return (
     <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-end mb-3">
         <h3 className="font-bold flex items-center gap-2 text-gray-800 text-base"><RefreshCw size={20} className="text-blue-600"/> Routine du Matin</h3>
         <div className="text-sm font-bold text-gray-500">{progress}%</div>
       </div>
+      
+      {/* BARRE DE PROGRESSION AJOUTÉE ICI */}
+      <div className="w-full bg-gray-100 rounded-full h-2.5 mb-5 overflow-hidden">
+        <div 
+            className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out" 
+            style={{ width: `${progress}%` }}
+        ></div>
+      </div>
+
       <div className="flex flex-wrap gap-3">
         {JOB_BOARDS.map(site => (
           <button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-bold transition-all ${checks[site.name] ? 'bg-gray-100 border-gray-300 text-gray-400 grayscale' : `bg-white ${site.color}`}`}>
@@ -483,66 +492,112 @@ const App = () => {
 
              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 {viewMode === 'list' ? (
-                   <div className="overflow-x-auto">
-                     <table className="w-full text-left text-sm md:text-base">
-                       <thead className="bg-gray-50 text-gray-600 font-bold uppercase text-xs border-b">
-                         <tr>
-                            <th className="p-4 w-12"></th>
-                            <th className="p-4">Entreprise</th>
-                            <th className="p-4">Poste</th>
-                            <th className="p-4">Date</th>
-                            <th className="p-4">Source</th>
-                            <th className="p-4">Lien / Contact</th>
-                            <th className="p-4">Statut</th>
-                            <th className="p-4 text-center">Relance</th>
-                            <th className="p-4 text-right">Action</th>
-                         </tr>
-                       </thead>
-                       <tbody className="divide-y">
-                         {filteredApps.map(app => (
-                           <tr key={app.id} className="hover:bg-gray-50/80 group transition-colors">
-                              <td className="p-4"><button onClick={()=>toggleFavorite(app)}><Heart size={20} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-300"}/></button></td>
-                              <td className="p-4">
-                                <div className="font-bold text-[#0f1f41] text-base max-w-[150px] truncate" title={app.company}>{app.company}</div>
-                                <div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5"><MapPin size={10}/>{app.location || "N/A"}</div>
-                              </td>
-                              <td className="p-4 text-gray-600 font-medium max-w-[150px] truncate" title={app.role}>{app.role}</td>
-                              <td className="p-4 text-gray-500 text-sm">{new Date(app.date).toLocaleDateString('fr-FR')}</td>
-                              <td className="p-4 whitespace-nowrap">
-                                <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded text-xs font-bold border border-gray-200">{app.source}</span>
-                              </td>
-                              
-                              <td className="p-4">
-                                {app.source === 'Contact direct' ? (
-                                    app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1 text-xs font-medium"><Mail size={14}/> {app.contact_email}</a> : <span className="text-gray-300 text-xs">-</span>
-                                ) : (
-                                    app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md flex items-center gap-1.5 w-fit hover:bg-blue-100 text-xs font-bold border border-blue-100 transition-colors"><ExternalLink size={14}/> Voir l'annonce</a> : <span className="text-gray-300 text-xs">-</span>
-                                )}
-                              </td>
+                   <>
+                     {/* VUE TABLEAU (ORDI) */}
+                     <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full text-left text-base">
+                          <thead className="bg-gray-50 text-gray-600 font-bold uppercase text-xs border-b">
+                            <tr>
+                               <th className="p-4 w-12"></th>
+                               <th className="p-4">Entreprise</th>
+                               <th className="p-4">Poste</th>
+                               <th className="p-4">Date</th>
+                               <th className="p-4">Source</th>
+                               <th className="p-4">Lien / Contact</th>
+                               <th className="p-4">Statut</th>
+                               <th className="p-4 text-center">Relance</th>
+                               <th className="p-4 text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y">
+                            {filteredApps.map(app => (
+                              <tr key={app.id} className="hover:bg-gray-50/80 group transition-colors">
+                                 <td className="p-4"><button onClick={()=>toggleFavorite(app)}><Heart size={20} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-300"}/></button></td>
+                                 <td className="p-4">
+                                   <div className="font-bold text-[#0f1f41] text-base max-w-[150px] truncate" title={app.company}>{app.company}</div>
+                                   <div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5"><MapPin size={10}/>{app.location || "N/A"}</div>
+                                 </td>
+                                 <td className="p-4 text-gray-600 font-medium max-w-[150px] truncate" title={app.role}>{app.role}</td>
+                                 <td className="p-4 text-gray-500 text-sm">{new Date(app.date).toLocaleDateString('fr-FR')}</td>
+                                 <td className="p-4 whitespace-nowrap">
+                                   <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded text-xs font-bold border border-gray-200">{app.source}</span>
+                                 </td>
+                                 
+                                 <td className="p-4">
+                                   {app.source === 'Contact direct' ? (
+                                       app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1 text-xs font-medium"><Mail size={14}/> {app.contact_email}</a> : <span className="text-gray-300 text-xs">-</span>
+                                   ) : (
+                                       app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md flex items-center gap-1.5 w-fit hover:bg-blue-100 text-xs font-bold border border-blue-100 transition-colors"><ExternalLink size={14}/> Voir l'annonce</a> : <span className="text-gray-300 text-xs">-</span>
+                                   )}
+                                 </td>
 
-                              <td className="p-4">
-                                <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${
-                                    app.status==='Postulé' ? 'bg-blue-50 border-blue-200 text-blue-700' : 
-                                    app.status==='Refusé' ? 'bg-red-50 border-red-200 text-red-700' : 
-                                    app.status==='Accepté' ? 'bg-green-50 border-green-200 text-green-700' : 
-                                    'bg-gray-50 border-gray-200'}`}>{app.status}</span>
-                              </td>
-                              <td className="p-4 text-center">
-                                <div className="flex flex-col items-center gap-1.5">
-                                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 opacity-50' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span>
-                                    <input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600"/>
+                                 <td className="p-4">
+                                   <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${
+                                       app.status==='Postulé' ? 'bg-blue-50 border-blue-200 text-blue-700' : 
+                                       app.status==='Refusé' ? 'bg-red-50 border-red-200 text-red-700' : 
+                                       app.status==='Accepté' ? 'bg-green-50 border-green-200 text-green-700' : 
+                                       'bg-gray-50 border-gray-200'}`}>{app.status}</span>
+                                 </td>
+                                 <td className="p-4 text-center">
+                                   <div className="flex flex-col items-center gap-1.5">
+                                       <span className={`text-xs font-bold px-2 py-0.5 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 opacity-50' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span>
+                                       <input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600"/>
+                                   </div>
+                                 </td>
+                                 <td className="p-4 text-right space-x-2">
+                                   <button onClick={()=>handleEdit(app)} className="text-gray-300 hover:text-blue-500 transition-colors"><Pencil size={18}/></button>
+                                   <button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
+                                 </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                     </div>
+                     
+                     {/* VUE CARTE (MOBILE UNIQUEMENT) */}
+                     <div className="md:hidden flex flex-col gap-4 p-4">
+                        {filteredApps.map(app => (
+                            <div key={app.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3 relative">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="font-bold text-lg text-[#0f1f41]">{app.company}</h3>
+                                        <p className="text-gray-600 font-medium">{app.role}</p>
+                                    </div>
+                                    <button onClick={()=>toggleFavorite(app)}><Heart size={20} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button>
                                 </div>
-                              </td>
-                              <td className="p-4 text-right space-x-2">
-                                <button onClick={()=>handleEdit(app)} className="text-gray-300 hover:text-blue-500 transition-colors"><Pencil size={18}/></button>
-                                <button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
-                              </td>
-                           </tr>
-                         ))}
-                       </tbody>
-                     </table>
-                     {filteredApps.length === 0 && <div className="p-20 text-center text-gray-400 flex flex-col items-center gap-3"><Search size={48} className="opacity-20"/><p className="text-lg">Aucune candidature trouvée</p></div>}
-                   </div>
+                                
+                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                    <MapPin size={14}/> {app.location || "Non renseigné"}
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 items-center mt-1">
+                                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
+                                       app.status==='Postulé' ? 'bg-blue-50 border-blue-200 text-blue-700' : 
+                                       app.status==='Refusé' ? 'bg-red-50 border-red-200 text-red-700' : 
+                                       app.status==='Accepté' ? 'bg-green-50 border-green-200 text-green-700' : 
+                                       'bg-gray-50 border-gray-200'}`}>{app.status}</span>
+                                    <span className="text-xs text-gray-400 border px-2 py-1 rounded bg-gray-50">{app.source}</span>
+                                    <span className="text-xs text-gray-400">{new Date(app.date).toLocaleDateString('fr-FR')}</span>
+                                </div>
+
+                                <div className="pt-3 border-t flex justify-between items-center mt-1">
+                                    {/* Lien Mobile */}
+                                    {app.source === 'Contact direct' ? (
+                                       app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-600 flex items-center gap-1 text-xs font-bold"><Mail size={14}/> Email</a> : <span className="text-gray-300 text-xs">-</span>
+                                   ) : (
+                                       app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 flex items-center gap-1 text-xs font-bold"><ExternalLink size={14}/> Voir l'offre</a> : <span className="text-gray-300 text-xs">-</span>
+                                   )}
+                                   
+                                   <div className="flex gap-3">
+                                        <button onClick={()=>handleEdit(app)} className="text-gray-400 hover:text-blue-500"><Pencil size={18}/></button>
+                                        <button onClick={()=>handleDelete(app.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={18}/></button>
+                                   </div>
+                                </div>
+                            </div>
+                        ))}
+                     </div>
+                     {filteredApps.length === 0 && <div className="p-20 text-center text-gray-400 flex flex-col items-center gap-3 md:block hidden"><Search size={48} className="opacity-20 mx-auto"/><p className="text-lg">Aucune candidature trouvée</p></div>}
+                   </>
                 ) : (
                    <div className="flex gap-4 p-4 overflow-x-auto h-full items-start bg-gray-50/50">
                       {STATUS_OPTIONS.map(status => (
