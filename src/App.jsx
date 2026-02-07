@@ -5,7 +5,7 @@ import {
   Search, Pencil, X, Mail, AlertTriangle, ExternalLink, FileText, 
   Upload, FileCheck, List, LogOut, User, Lock, LayoutGrid,
   CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, 
-  Link as LinkIcon, Star, Check, File, BookOpen, Smartphone, Share, Menu, Monitor
+  Link as LinkIcon, Star, Check, File, BookOpen, Smartphone, Share, Menu, Monitor, School
 } from 'lucide-react';
 
 // --- CONFIGURATION SUPABASE ---
@@ -58,7 +58,6 @@ const DailyRoutine = () => {
         <div className="text-sm font-bold text-gray-500">{progress}%</div>
       </div>
       
-      {/* BARRE DE PROGRESSION */}
       <div className="w-full bg-gray-100 rounded-full h-2.5 mb-5 overflow-hidden">
         <div 
             className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out" 
@@ -84,6 +83,16 @@ const DailyRoutine = () => {
 // --- COMPOSANT : VUE CONSEILS ---
 const AdviceView = () => (
     <div className="space-y-6 animate-fadeIn">
+        
+        {/* BANDEAU CY TECH */}
+        <div className="bg-blue-600 rounded-xl p-4 text-white shadow-md flex items-start gap-3">
+            <School className="flex-shrink-0 mt-1" size={24}/>
+            <div>
+                <h3 className="font-bold text-lg">Espace Étudiants CY Tech</h3>
+                <p className="text-blue-100 text-sm">Les liens et ressources ci-dessous sont spécifiquement sélectionnés pour les élèves de l'école (Cergy & Pau).</p>
+            </div>
+        </div>
+
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <h2 className="text-2xl font-bold text-[#0f1f41] mb-6 flex items-center gap-2"><MapPin className="text-blue-600"/> Où S'inscrire (Les Liens)</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -308,7 +317,8 @@ const LegalModal = ({ onClose, onExport, onDeleteAccount, isAuthScreen }) => (
       <div className="space-y-6 text-sm text-gray-700">
         <section>
             <h3 className="font-bold text-lg mb-2 text-gray-900">1. Éditeur & Contact</h3>
-            <p><strong>Développement :</strong> Sheryne OUARGHI-MHIRI</p>
+            <p><strong>Développement :</strong> Sheryne OUARGHI-MHIRI (Étudiante CY Tech Cergy)</p>
+            <p><strong>Droits :</strong> © 2026 Sheryne OUARGHI-MHIRI. Tous droits réservés.</p>
             <p><strong>Contact :</strong> <a href="mailto:sheryne.ouarghi.pro@gmail.com" className="text-blue-600 hover:underline font-medium">sheryne.ouarghi.pro@gmail.com</a></p>
             <p className="mt-2 text-gray-500 italic text-xs">Certaines idées et fonctionnalités sont inspirées par <strong>Myriam Bensaïd</strong>.</p>
         </section>
@@ -399,8 +409,9 @@ const AuthScreen = ({ supabase }) => {
             </div>
         </div>
 
-        <div className="mt-12 md:mt-0 pt-6 border-t border-gray-700 z-10">
-            <button onClick={() => setShowLegal(true)} className="text-sm text-gray-400 hover:text-white underline transition-colors flex items-center gap-2">
+        <div className="mt-12 md:mt-0 pt-6 border-t border-gray-700 z-10 flex flex-col gap-4">
+            <p className="text-sm text-blue-200 font-medium">Conçu pour les élèves de CY Tech, par une étudiante de CY Tech (Cergy).</p>
+            <button onClick={() => setShowLegal(true)} className="text-sm text-gray-400 hover:text-white underline transition-colors flex items-center gap-2 w-fit">
                 <ShieldCheck size={16}/> Mentions Légales & RGPD
             </button>
         </div>
@@ -587,6 +598,9 @@ const App = () => {
         return new Date(b.date) - new Date(a.date);
     });
 
+  // Helper pour savoir si on attend un email ou un lien
+  const isDirectContact = newApp.source === 'Contact direct';
+
   if (!session) return <AuthScreen supabase={supabase} />;
 
   return (
@@ -648,7 +662,24 @@ const App = () => {
                         <div className="space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Statut</label><select className="w-full border border-gray-300 p-3 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.status} onChange={e=>setNewApp({...newApp, status: e.target.value})}>{STATUS_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
                         <div className="space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Date</label><input type="date" className="w-full border border-gray-300 p-3 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required /></div>
                         <div className="space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Ville</label><input list="locations-list" placeholder="Ex: Paris..." className="w-full border border-gray-300 p-3 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} /></div>
-                        <div className="lg:col-span-2 space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Lien / Email</label><div className="relative"><LinkIcon className="absolute left-3 top-3.5 text-gray-400" size={16}/><input placeholder="URL ou email..." className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.application_url || newApp.contact_email} onChange={e=>setNewApp({...newApp, application_url: e.target.value, contact_email: e.target.value})} /></div></div>
+                        
+                        {/* INPUT INTELLIGENT : EMAIL OU LIEN */}
+                        <div className="lg:col-span-2 space-y-1.5">
+                            <label className="text-xs font-bold text-gray-500 uppercase ml-1">{isDirectContact ? "Email du contact" : "Lien de l'annonce"}</label>
+                            <div className="relative">
+                                {isDirectContact ? <Mail className="absolute left-3 top-3.5 text-gray-400" size={16}/> : <LinkIcon className="absolute left-3 top-3.5 text-gray-400" size={16}/>}
+                                <input 
+                                    placeholder={isDirectContact ? "rh@entreprise.com" : "https://www.linkedin.com/jobs/..."} 
+                                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" 
+                                    value={isDirectContact ? newApp.contact_email : newApp.application_url} 
+                                    onChange={e => {
+                                        if (isDirectContact) setNewApp({...newApp, contact_email: e.target.value, application_url: ''});
+                                        else setNewApp({...newApp, application_url: e.target.value, contact_email: ''});
+                                    }} 
+                                />
+                            </div>
+                        </div>
+
                         <button disabled={uploading} className={`lg:col-span-4 py-3.5 rounded-lg text-white font-bold text-base shadow-md transition-all active:scale-95 ${editingId ? 'bg-orange-500 hover:bg-orange-600' : 'bg-[#005792] hover:bg-[#004270]'}`}>{uploading ? "Chargement..." : (editingId ? "Mettre à jour" : "Ajouter")}</button>
                     </form>
                 </div>
@@ -666,8 +697,10 @@ const App = () => {
                         </div>
                         <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-4 py-2.5 text-base bg-white shadow-sm cursor-pointer outline-none">
                             <option value="date_desc">📅 Plus récent</option>
+                            <option value="date_asc">📅 Plus ancien</option>
                             <option value="source">🌐 Par Plateforme</option>
                             <option value="favorite">❤️ Favoris</option>
+                            <option value="alpha">🔤 Alphabétique</option>
                         </select>
                      </div>
 
