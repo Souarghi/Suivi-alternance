@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { 
@@ -8,16 +7,10 @@ import {
   CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, Link as LinkIcon, Smartphone, Share, Check
 } from 'lucide-react';
 
-// IMPORT DES VUES SÉPARÉES
-// Assure-toi que les fichiers sont bien dans le dossier "components" !
-import DesktopView from './components/DesktopView';
-import MobileView from './components/MobileView';
-
 // 👇 REMETS TES CLÉS SUPABASE ICI
 const supabaseUrl = 'https://mvloohmnvggirpdfhotb.supabase.co';
 const supabaseKey = 'sb_publishable_fAGf692lpXVGI1YZgyx3Ew_Dz_tEEYO';
 
-// --- CONFIGURATION ---
 const safeSupabase = () => {
   if (!supabaseUrl || supabaseUrl.includes('TON_URL')) return null;
   return createClient(supabaseUrl, supabaseKey);
@@ -36,6 +29,8 @@ const JOB_BOARDS = [
 ];
 
 // --- COMPOSANTS INTERNES ---
+
+// 1. Routine du matin
 const DailyRoutine = () => {
     const [checks, setChecks] = useState({});
     const today = new Date().toLocaleDateString('fr-FR');
@@ -46,11 +41,12 @@ const DailyRoutine = () => {
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
         <div className="flex justify-between items-center mb-3"><h3 className="font-bold flex items-center gap-2 text-gray-800"><RefreshCw size={18} className={progress===100?"text-green-500":"text-blue-600"}/> Routine Matin <span className="hidden sm:inline">({today})</span></h3><div className="text-xs font-bold text-gray-500">{progress}%</div></div>
         <div className="w-full bg-gray-100 rounded-full h-2 mb-4"><div className={`h-2 rounded-full transition-all duration-500 ${progress===100?'bg-green-500':'bg-blue-500'}`} style={{width: `${progress}%`}}></div></div>
-        <div className="flex flex-wrap gap-2">{JOB_BOARDS.map(site => (<button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold ${checks[site.name] ? 'bg-gray-100 border-gray-300 text-gray-400 grayscale' : `bg-white ${site.color}`}`}>{checks[site.name] ? <CheckCircle size={14}/> : <div className="w-3.5 h-3.5 rounded-full border border-current"></div>}{site.name}<a href={site.url} target="_blank" rel="noreferrer" onClick={(e)=>e.stopPropagation()} className="ml-1 opacity-70 hover:opacity-100"><ExternalLink size={10}/></a></button>))}</div>
+        <div className="flex flex-wrap gap-2">{JOB_BOARDS.map(site => (<button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${checks[site.name] ? 'bg-gray-100 border-gray-300 text-gray-400 grayscale' : `bg-white ${site.color}`}`}>{checks[site.name] ? <CheckCircle size={14}/> : <div className="w-3.5 h-3.5 rounded-full border border-current"></div>}{site.name}<a href={site.url} target="_blank" rel="noreferrer" onClick={(e)=>e.stopPropagation()} className="ml-1 opacity-70 hover:opacity-100"><ExternalLink size={10}/></a></button>))}</div>
       </div>
     );
 };
 
+// 2. Ecran de Connexion
 const AuthScreen = ({ supabase }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -65,14 +61,14 @@ const AuthScreen = ({ supabase }) => {
     try {
       const { error } = isSignUp ? await supabase.auth.signUp({ email, password }) : await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      if (isSignUp) { setMessage('Compte créé !'); setIsSignUp(false); }
+      if (isSignUp) { setMessage('Compte créé ! Connecte-toi.'); setIsSignUp(false); }
     } catch (error) { setMessage(error.message); } finally { setLoading(false); }
   };
 
   return (
     <div className="min-h-screen bg-white flex flex-col md:flex-row font-sans">
       <div className="md:w-1/2 bg-[#0f1f41] text-white p-8 flex flex-col justify-center">
-        <h1 className="text-3xl font-bold mb-4 flex items-center gap-3"><img src="/logo.png" className="w-10 h-10 bg-white rounded-lg p-1"/> Suivi Alternance</h1>
+        <h1 className="text-3xl font-bold mb-4 flex items-center gap-3"><img src="/logo.png" onError={(e)=>e.target.style.display='none'} className="w-10 h-10 bg-white rounded-lg p-1" alt="Logo"/> Suivi Alternance</h1>
         <p className="mb-8 text-gray-300">Centralisez vos candidatures, gérez vos relances et décrochez votre alternance.</p>
       </div>
       <div className="md:w-1/2 bg-gray-50 flex items-center justify-center p-6">
@@ -97,8 +93,11 @@ const App = () => {
   const [applications, setApplications] = useState([]);
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
+  
+  // UI States
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("date_desc");
+  const [viewMode, setViewMode] = useState("list"); 
   const [editingId, setEditingId] = useState(null);
   const [uploading, setUploading] = useState(false);
   const formRef = useRef(null);
@@ -131,7 +130,7 @@ const App = () => {
 
   const uploadFile = async (file) => {
     if (!file) return null;
-    if (file.size > 2 * 1024 * 1024) { alert("Fichier > 2 Mo"); return null; }
+    if (file.size > 2 * 1024 * 1024) { alert("Fichier trop lourd (Max 2 Mo)"); return null; }
     const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
     const { error } = await supabase.storage.from('documents').upload(fileName, file);
     if (error) { alert("Erreur upload"); return null; }
@@ -156,7 +155,6 @@ const App = () => {
     e.preventDefault();
     const isDuplicate = newApp.company && applications.some(a => a.company.toLowerCase().trim() === newApp.company.toLowerCase().trim() && a.id !== editingId);
     if (isDuplicate && !editingId) return alert("Doublon détecté !");
-    
     setUploading(true);
     const appData = { ...newApp };
     if (editingId) {
@@ -285,6 +283,10 @@ const App = () => {
           <div className="lg:col-span-2 space-y-4">
              {/* CONTROLES */}
              <div className="flex flex-col md:flex-row gap-3">
+                <div className="flex bg-white rounded-lg border p-1 self-start">
+                   <button onClick={()=>setViewMode('list')} className={`p-2 rounded ${viewMode==='list'?'bg-gray-100 text-blue-600':'text-gray-400'}`}><List size={18}/></button>
+                   <button onClick={()=>setViewMode('kanban')} className={`p-2 rounded ${viewMode==='kanban'?'bg-gray-100 text-blue-600':'text-gray-400'}`}><LayoutGrid size={18}/></button>
+                </div>
                 <div className="flex-1 relative">
                    <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
                    <input placeholder="Rechercher..." className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)}/>
@@ -297,35 +299,86 @@ const App = () => {
                 </select>
              </div>
 
-             {/* ========== VUE HYBRIDE INTELLIGENTE ========== */}
-             <div className="bg-transparent md:bg-white md:rounded-xl md:shadow-sm md:border md:border-gray-200 overflow-hidden min-h-[500px]">
+             {/* VUE LISTE (TABLEAU ORDI + CARTES MOBILE) */}
+             {viewMode === 'list' && (
+               <div className="bg-transparent md:bg-white md:rounded-xl md:shadow-sm md:border md:border-gray-200 overflow-hidden min-h-[500px]">
                  
-                 {/* 1. TABLEAU (VISIBLE UNIQUEMENT SUR ORDI) */}
+                 {/* TABLEAU (VISIBLE UNIQUEMENT SUR ORDI "md:block") */}
                  <div className="hidden md:block overflow-x-auto">
-                    <DesktopView 
-                        applications={filteredApps} 
-                        toggleFavorite={toggleFavorite} 
-                        calculateRelance={calculateRelance} 
-                        toggleRelance={toggleRelance} 
-                        handleDelete={handleDelete} 
-                        handleEdit={handleEdit} 
-                    />
+                    <table className="w-full text-left text-sm">
+                       <thead className="bg-gray-50 text-gray-500 font-bold uppercase text-xs border-b">
+                         <tr><th className="p-4 w-10"></th><th className="p-4">Entreprise</th><th className="p-4">Poste</th><th className="p-4">Statut</th><th className="p-4">Infos</th><th className="p-4 text-center">Relance</th><th className="p-4 text-center">Fait</th><th className="p-4 text-right">Action</th></tr>
+                       </thead>
+                       <tbody className="divide-y">
+                         {filteredApps.map(app => (
+                           <tr key={app.id} className="hover:bg-gray-50 group">
+                              <td className="p-4"><button onClick={()=>toggleFavorite(app)}><Heart size={18} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-300"}/></button></td>
+                              <td className="p-4 font-bold text-[#0f1f41]">{app.company}</td>
+                              <td className="p-4 text-gray-600">{app.role}</td>
+                              <td className="p-4"><span className={`px-2 py-1 rounded-full text-xs font-medium border ${app.status==='Postulé'?'bg-blue-50 border-blue-200 text-blue-700':app.status==='Refusé'?'bg-red-50 border-red-200 text-red-700':app.status==='Accepté'?'bg-green-50 border-green-200 text-green-700':'bg-gray-50 border-gray-200'}`}>{app.status}</span></td>
+                              <td className="p-4 text-xs">{app.location && <div className="font-bold">{app.location}</div>}{app.contact_email && <div className="text-blue-500">{app.contact_email}</div>}{app.application_url && <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">Lien</a>}</td>
+                              <td className="p-4 text-center"><span className={`text-xs font-bold px-2 py-1 rounded ${app.relanceDone ? 'bg-green-100 text-green-700' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span></td>
+                              <td className="p-4 text-center"><input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer"/></td>
+                              <td className="p-4 text-right"><button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={16}/></button><button onClick={()=>handleEdit(app)} className="text-gray-300 hover:text-blue-500 p-1"><Pencil size={16}/></button></td>
+                           </tr>
+                         ))}
+                       </tbody>
+                    </table>
                  </div>
 
-                 {/* 2. CARTES (VISIBLE UNIQUEMENT SUR MOBILE) */}
-                 <div className="md:hidden">
-                    <MobileView 
-                        applications={filteredApps} 
-                        toggleFavorite={toggleFavorite} 
-                        calculateRelance={calculateRelance} 
-                        toggleRelance={toggleRelance} 
-                        handleDelete={handleDelete} 
-                        handleEdit={handleEdit} 
-                    />
+                 {/* CARTES (VISIBLE UNIQUEMENT SUR MOBILE "md:hidden") */}
+                 <div className="md:hidden space-y-3">
+                    {filteredApps.map(app => (
+                       <div key={app.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm relative">
+                          <div className="flex justify-between items-start mb-2">
+                             <div><h3 className="font-bold text-[#0f1f41] text-lg">{app.company}</h3><p className="text-gray-600 text-sm">{app.role}</p></div>
+                             <button onClick={()=>toggleFavorite(app)}><Heart size={20} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button>
+                          </div>
+                          <div className="flex flex-wrap gap-2 mb-3">
+                             <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${app.status==='Postulé'?'bg-blue-50 border-blue-200 text-blue-700':app.status==='Refusé'?'bg-red-50 border-red-200 text-red-700':app.status==='Accepté'?'bg-green-50 border-green-200 text-green-700':'bg-gray-50 border-gray-200'}`}>{app.status}</span>
+                             <span className="text-xs text-gray-500 border px-2 py-0.5 rounded-full">{app.source}</span>
+                          </div>
+                          <div className="flex flex-col gap-1 text-xs text-gray-500 mb-3 bg-gray-50 p-2 rounded-lg">
+                             {app.location && <span className="flex items-center gap-1"><MapPin size={12}/> {app.location}</span>}
+                             {app.contact_email && <a href={`mailto:${app.contact_email}`} className="text-blue-600 flex items-center gap-1"><Mail size={12}/> {app.contact_email}</a>}
+                             {app.application_url && <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 flex items-center gap-1"><ExternalLink size={12}/> Voir l'annonce</a>}
+                          </div>
+                          <div className="flex justify-between items-center border-t pt-3 mt-2">
+                             <div className="flex items-center gap-2">
+                                 <input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 rounded"/>
+                                 <span className={`text-xs font-bold ${app.relanceDone ? 'text-green-600' : 'text-orange-600'}`}>J+15: {calculateRelance(app.date)}</span>
+                             </div>
+                             <div className="flex gap-3">
+                                 <button onClick={()=>handleEdit(app)} className="text-blue-500 bg-blue-50 p-2 rounded-lg"><Pencil size={18}/></button>
+                                 <button onClick={()=>handleDelete(app.id)} className="text-red-400 bg-red-50 p-2 rounded-lg"><Trash2 size={18}/></button>
+                             </div>
+                          </div>
+                       </div>
+                    ))}
                  </div>
-                 
                  {filteredApps.length === 0 && <div className="p-10 text-center text-gray-400">Aucune candidature</div>}
-             </div>
+               </div>
+             )}
+
+             {/* VUE KANBAN */}
+             {viewMode === 'kanban' && (
+               <div className="flex gap-4 p-4 overflow-x-auto h-full items-start">
+                  {statusOptions.map(status => (
+                    <div key={status} className="min-w-[260px] bg-gray-50 rounded-xl p-3 border border-gray-200">
+                       <h3 className="font-bold text-xs uppercase text-gray-500 mb-3 flex justify-between">{status} <span className="bg-white border px-1.5 rounded text-gray-400">{filteredApps.filter(a=>a.status===status).length}</span></h3>
+                       <div className="flex flex-col gap-2">
+                         {filteredApps.filter(a=>a.status===status).map(app => (
+                           <div key={app.id} className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm cursor-pointer hover:shadow-md" onClick={()=>handleEdit(app)}>
+                              <div className="flex justify-between items-start"><div className="font-bold text-[#0f1f41]">{app.company}</div><Heart size={14} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></div>
+                              <div className="text-xs text-gray-500 mb-2">{app.role}</div>
+                              <div className="flex justify-between items-end"><div className="text-[10px] text-gray-400 bg-gray-50 inline-block px-1.5 py-0.5 rounded">Relance: {calculateRelance(app.date)}</div>{app.relanceDone && <CheckCircle size={14} className="text-green-500"/>}</div>
+                           </div>
+                         ))}
+                       </div>
+                    </div>
+                  ))}
+               </div>
+             )}
           </div>
         </div>
       </div>
