@@ -415,12 +415,12 @@ const App = () => {
                            <tr key={app.id} className="hover:bg-gray-50/80 group transition-colors">
                               <td className="p-4"><button onClick={()=>toggleFavorite(app)}><Heart size={18} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-300"}/></button></td>
                               <td className="p-4">
-                                <div className="font-bold text-[#0f1f41]">{app.company}</div>
+                                <div className="font-bold text-[#0f1f41] max-w-[150px] truncate" title={app.company}>{app.company}</div>
                                 <div className="text-[10px] text-gray-400 flex items-center gap-1"><MapPin size={8}/>{app.location || "N/A"}</div>
                               </td>
-                              <td className="p-4 text-gray-600 font-medium">{app.role}</td>
+                              <td className="p-4 text-gray-600 font-medium max-w-[150px] truncate" title={app.role}>{app.role}</td>
                               <td className="p-4 text-gray-500 text-xs">{new Date(app.date).toLocaleDateString('fr-FR')}</td>
-                              <td className="p-4">
+                              <td className="p-4 whitespace-nowrap">
                                 <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold border border-gray-200">{app.source}</span>
                               </td>
                               
@@ -467,9 +467,9 @@ const App = () => {
                                       <div className="font-bold text-[#0f1f41] text-sm leading-tight">{app.company}</div>
                                       <button onClick={(e)=>{e.stopPropagation(); toggleFavorite(app);}}><Heart size={14} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-200"}/></button>
                                   </div>
-                                  <div className="text-[11px] text-gray-500 mb-3">{app.role}</div>
+                                  <div className="text-[11px] text-gray-500 mb-1">{app.role}</div>
                                   <div className="flex justify-between items-center border-t pt-2 mt-2">
-                                    <div className="text-[9px] font-bold text-gray-400 uppercase">{app.source}</div>
+                                    <div className="text-[9px] font-bold text-gray-400 uppercase whitespace-nowrap overflow-hidden text-ellipsis">{app.source}</div>
                                     <div className="text-[9px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold">{calculateRelance(app.date)}</div>
                                   </div>
                                </div>
