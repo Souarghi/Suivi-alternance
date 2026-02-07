@@ -61,7 +61,6 @@ const DailyRoutine = () => {
           <button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${checks[site.name] ? 'bg-gray-100 border-gray-300 text-gray-400 grayscale' : `bg-white ${site.color}`}`}>
             {checks[site.name] ? <CheckCircle size={14}/> : <div className="w-3.5 h-3.5 rounded-full border border-current"></div>}
             {site.name}
-            {/* Lien rétabli ici */}
             <a href={site.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="ml-1 opacity-70 hover:opacity-100 hover:scale-110 transition-transform">
                 <ExternalLink size={10}/>
             </a>
@@ -135,7 +134,10 @@ const AuthScreen = ({ supabase }) => {
       <div className="md:w-1/2 bg-[#0f1f41] text-white p-8 md:p-12 flex flex-col justify-between">
         <div>
             <div className="flex items-center gap-3 mb-8">
-                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center p-2"><Briefcase className="text-[#0f1f41]" size={24}/></div>
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center p-2">
+                    <img src="/logo.png" onError={(e) => {e.target.style.display='none';}} alt="Logo" className="w-full h-full object-contain"/>
+                    <Briefcase className="text-[#0f1f41] absolute opacity-0" size={24}/>
+                </div>
                 <span className="text-2xl font-bold tracking-tight">Suivi Alternance</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">Ne perdez plus le fil de vos <span className="text-[#4dabf7]">candidatures</span>.</h1>
@@ -204,8 +206,26 @@ const App = () => {
     finally { setLoading(false); }
   };
 
+  // --- LOGIQUE ANTI-DOUBLON ---
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Normalisation pour comparer "Thales", "thalès", "THALES"
+    const normalize = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
+    const cleanCompany = normalize(newApp.company);
+
+    // Vérification
+    const isDuplicate = applications.some(app => 
+        app.id !== editingId && // On ne compare pas avec soi-même si on édite
+        normalize(app.company) === cleanCompany
+    );
+
+    if (isDuplicate) {
+        if (!window.confirm(`⚠️ Attention : Vous avez déjà une candidature pour "${newApp.company}". Voulez-vous quand même l'ajouter ?`)) {
+            return; // On annule si l'utilisateur dit Non
+        }
+    }
+
     setUploading(true);
     if (editingId) {
       await supabase.from('applications').update(newApp).eq('id', editingId);
@@ -255,6 +275,10 @@ const App = () => {
     return date.toLocaleDateString('fr-FR'); 
   };
 
+  // --- PRÉPARATION AUTO-COMPLÉTION ---
+  const uniqueCompanies = [...new Set(applications.map(a => a.company).filter(Boolean))].sort();
+  const uniqueLocations = [...new Set(applications.map(a => a.location).filter(Boolean))].sort();
+
   const filteredApps = applications
     .filter(a => a.company?.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a, b) => {
@@ -273,7 +297,14 @@ const App = () => {
         
         {/* HEADER */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex justify-between items-center">
-          <div className="flex items-center gap-3"><Briefcase size={24} className="text-blue-500"/><h1 className="font-bold text-xl text-[#0f1f41]">Suivi Alternance</h1></div>
+          <div className="flex items-center gap-3">
+             {/* LOGO AVEC FALLBACK */}
+             <div className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden relative">
+                <img src="/logo.png" onError={(e) => {e.target.style.display='none';}} className="w-full h-full object-contain z-10" alt="Logo"/>
+                <Briefcase size={20} className="text-blue-500 absolute opacity-50"/>
+             </div>
+             <h1 className="font-bold text-xl text-[#0f1f41]">Suivi Alternance</h1>
+          </div>
           <button onClick={() => {supabase.auth.signOut(); setSession(null);}} className="text-red-500 p-2 hover:bg-red-50 rounded-lg"><LogOut size={20}/></button>
         </div>
 
@@ -291,9 +322,17 @@ const App = () => {
             </div>
             
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* LISTES POUR AUTO-COMPLETION */}
+                <datalist id="companies-list">
+                    {uniqueCompanies.map(c => <option key={c} value={c}/>)}
+                </datalist>
+                <datalist id="locations-list">
+                    {uniqueLocations.map(l => <option key={l} value={l}/>)}
+                </datalist>
+
                 <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Entreprise</label>
-                    <input list="companies" placeholder="Ex: Thales, Google..." className="w-full border p-2.5 rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" value={newApp.company} onChange={e=>setNewApp({...newApp, company: e.target.value})} required/>
+                    <input list="companies-list" placeholder="Ex: Thales, Google..." className="w-full border p-2.5 rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" value={newApp.company} onChange={e=>setNewApp({...newApp, company: e.target.value})} required/>
                 </div>
                 <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Poste</label>
@@ -318,7 +357,7 @@ const App = () => {
                 </div>
                 <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Ville</label>
-                    <input placeholder="Ex: Paris, Lyon..." className="w-full border p-2.5 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
+                    <input list="locations-list" placeholder="Ex: Paris, Lyon..." className="w-full border p-2.5 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
                 </div>
                 <div className="lg:col-span-2 space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Lien de l'annonce ou Email</label>
@@ -365,7 +404,7 @@ const App = () => {
                             <th className="p-4">Poste</th>
                             <th className="p-4">Date</th>
                             <th className="p-4">Source</th>
-                            <th className="p-4">Lien / Contact</th> {/* Nouvelle colonne rétablie */}
+                            <th className="p-4">Lien / Contact</th>
                             <th className="p-4">Statut</th>
                             <th className="p-4 text-center">Relance</th>
                             <th className="p-4 text-right">Action</th>
@@ -385,7 +424,6 @@ const App = () => {
                                 <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold border border-gray-200">{app.source}</span>
                               </td>
                               
-                              {/* Colonne LIEN rétablie ici */}
                               <td className="p-4">
                                 {app.source === 'Contact direct' ? (
                                     app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1 text-[10px]"><Mail size={12}/> {app.contact_email}</a> : <span className="text-gray-300 text-xs">-</span>
