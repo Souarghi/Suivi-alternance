@@ -192,7 +192,7 @@ const TutosView = () => (
     </div>
 );
 
-// --- COMPOSANT : MODAL PROFIL & CV ---
+// --- COMPOSANT : MODAL PROFIL & CV (CORRIGÉ) ---
 const ProfileModal = ({ onClose, profile, handleProfileUpload, email, isDemo }) => {
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
@@ -211,11 +211,32 @@ const ProfileModal = ({ onClose, profile, handleProfileUpload, email, isDemo }) 
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
+                        {/* CV HUMAIN - RESTAURÉ */}
                         <div className="border rounded-xl p-4 hover:bg-gray-50 transition-colors">
-                             <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-2"><FileText className="text-orange-500"/> CV "Humain"</h3>
-                             <button disabled={isDemo} className={`w-full border-2 border-dashed py-3 rounded-lg text-sm font-medium flex justify-center items-center gap-2 ${isDemo ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-500'}`}>
-                                <Upload size={16}/> {isDemo ? "Upload désactivé en démo" : "Importer mon CV (PDF)"}
-                             </button>
+                             <div className="flex justify-between items-start mb-3">
+                                <h3 className="font-bold text-gray-700 flex items-center gap-2"><FileText className="text-orange-500"/> CV "Humain"</h3>
+                                {profile?.cv_human && <a href={profile.cv_human} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-sm flex items-center gap-1"><ExternalLink size={14}/> Voir</a>}
+                             </div>
+                             <div className="relative">
+                                <input type="file" disabled={isDemo} onChange={(e) => handleProfileUpload(e.target.files[0], 'human')} className={`absolute inset-0 w-full h-full opacity-0 ${isDemo ? 'cursor-not-allowed' : 'cursor-pointer'}`}/>
+                                <button disabled={isDemo} className={`w-full border-2 border-dashed py-3 rounded-lg text-sm font-medium flex justify-center items-center gap-2 ${isDemo ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-500 transition-all'}`}>
+                                    <Upload size={16}/> {isDemo ? "Upload désactivé en démo" : (profile?.cv_human ? "Remplacer le fichier" : "Importer mon CV (PDF)")}
+                                </button>
+                             </div>
+                        </div>
+
+                        {/* CV ATS - RESTAURÉ */}
+                        <div className="border rounded-xl p-4 hover:bg-gray-50 transition-colors">
+                             <div className="flex justify-between items-start mb-3">
+                                <h3 className="font-bold text-gray-700 flex items-center gap-2"><FileCheck className="text-green-600"/> CV "ATS" (Robot)</h3>
+                                {profile?.cv_ats && <a href={profile.cv_ats} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-sm flex items-center gap-1"><ExternalLink size={14}/> Voir</a>}
+                             </div>
+                             <div className="relative">
+                                <input type="file" disabled={isDemo} onChange={(e) => handleProfileUpload(e.target.files[0], 'ats')} className={`absolute inset-0 w-full h-full opacity-0 ${isDemo ? 'cursor-not-allowed' : 'cursor-pointer'}`}/>
+                                <button disabled={isDemo} className={`w-full border-2 border-dashed py-3 rounded-lg text-sm font-medium flex justify-center items-center gap-2 ${isDemo ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-500 transition-all'}`}>
+                                    <Upload size={16}/> {isDemo ? "Upload désactivé en démo" : (profile?.cv_ats ? "Remplacer le fichier" : "Importer version ATS")}
+                                </button>
+                             </div>
                         </div>
                     </div>
                 </div>
@@ -676,7 +697,7 @@ const App = () => {
 
       {/* MODALS */}
       {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={() => {}} onDeleteAccount={() => {}} />}
-      {showProfile && <ProfileModal onClose={() => setShowProfile(false)} profile={profile} handleProfileUpload={handleProfileUpload} email={session.user.email} />}
+      {showProfile && <ProfileModal onClose={() => setShowProfile(false)} profile={profile} handleProfileUpload={handleProfileUpload} email={session.user.email} isDemo={isDemo} />}
     </div>
   );
 };
