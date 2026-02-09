@@ -5,7 +5,7 @@ import {
   Search, Pencil, X, Mail, AlertTriangle, ExternalLink, FileText, 
   Upload, FileCheck, List, LogOut, User, Lock, LayoutGrid,
   CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, 
-  Link as LinkIcon, Star, Check, File, BookOpen, Smartphone, Share, Menu, Monitor, School
+  Link as LinkIcon, Star, Check, File, BookOpen, Smartphone, Share, Menu, Monitor, School, Eye
 } from 'lucide-react';
 
 // --- CONFIGURATION SUPABASE ---
@@ -17,6 +17,14 @@ const safeSupabase = () => {
   return createClient(supabaseUrl, supabaseKey);
 };
 const supabase = safeSupabase();
+
+// --- DONNÉES DE DÉMO (GÉNÉRIQUES) ---
+const DEMO_DATA = [
+  { id: 1, company: "Entreprise A", role: "Développeur Fullstack", status: "Entretien", source: "LinkedIn", date: "2024-02-15", location: "Paris", application_url: "https://example.com", isFavorite: true, relanceDone: false },
+  { id: 2, company: "Entreprise B", role: "Data Analyst", status: "Refusé", source: "WTTJ", date: "2024-01-20", location: "Lyon", application_url: "", isFavorite: false, relanceDone: true },
+  { id: 3, company: "Entreprise C", role: "Consultant Cyber", status: "Postulé", source: "JobTeaser", date: new Date().toISOString().split('T')[0], location: "La Défense", contact_email: "rh@entreprise-c.com", isFavorite: false, relanceDone: false },
+  { id: 4, company: "Entreprise D", role: "Chef de Projet IT", status: "A faire", source: "AFI24", date: "2024-03-01", location: "Bordeaux", application_url: "", isFavorite: true, relanceDone: false },
+];
 
 // --- DONNÉES GLOBALES ---
 const JOB_BOARDS = [
@@ -83,8 +91,6 @@ const DailyRoutine = () => {
 // --- COMPOSANT : VUE CONSEILS ---
 const AdviceView = () => (
     <div className="space-y-6 animate-fadeIn">
-        
-        {/* BANDEAU CY TECH */}
         <div className="bg-blue-600 rounded-xl p-4 text-white shadow-md flex items-start gap-3">
             <School className="flex-shrink-0 mt-1" size={24}/>
             <div>
@@ -103,7 +109,7 @@ const AdviceView = () => (
                 </div>
                 <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
                     <h3 className="font-bold text-purple-900 mb-2">Teams DRE</h3>
-                    <p className="text-sm text-gray-600">Rejoignez l'équipe via le QR code (affiché en cours). Activez les notifications du canal général (les offres tombent là !).</p>
+                    <p className="text-sm text-gray-600">Rejoignez l'équipe via le QR code (affiché en cours). Activez les notifications du canal général.</p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg border border-green-100">
                     <h3 className="font-bold text-green-900 mb-2">JobTeaser École</h3>
@@ -128,21 +134,11 @@ const AdviceView = () => (
                     <h3 className="font-bold text-lg">CV "Humain"</h3>
                     <p className="text-gray-600 text-sm">Pour les envois par mail ou remises en main propre. Mettez le logo de l'école + logo AFI24.</p>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-bold mb-2">Contenu indispensable :</h4>
-                    <ul className="list-disc pl-5 text-sm space-y-1 text-gray-700">
-                        <li><strong>Liens :</strong> LinkedIn et GitHub cliquables.</li>
-                        <li><strong>Compétences :</strong> Adaptez-les à l'offre ! Utilisez le vocabulaire exact. Outil : <a href="https://candidat.francetravail.fr/metierscope/" target="_blank" className="text-blue-600 hover:underline">Métierscope</a>.</li>
-                        <li><strong>Photo :</strong> Pro. Pas d'adresse exacte (juste la ville), pas de situation familiale. Mentionnez le Permis B.</li>
-                        <li><strong>Projets :</strong> Pas juste le titre. Précisez : Durée / Taille équipe / Réalisations (Contexte, Action, Résultat).</li>
-                    </ul>
-                </div>
             </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <h2 className="text-2xl font-bold text-[#0f1f41] mb-6 flex items-center gap-2"><User className="text-purple-600"/> L'Entretien & Le Pitch</h2>
-            
             <div className="mb-6">
                 <h3 className="font-bold text-lg mb-3 bg-purple-100 inline-block px-2 rounded text-purple-800">Le Pitch de 3 minutes (Structure idéale)</h3>
                 <ol className="list-decimal pl-5 space-y-2 text-sm text-gray-700">
@@ -154,33 +150,6 @@ const AdviceView = () => (
                     <li><strong>Conclusion :</strong> Rendre la parole (Interdiction de dire "Voilà" à la fin !).</li>
                 </ol>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                     <h3 className="font-bold text-lg mb-2">La Méthode STAR</h3>
-                     <p className="text-sm text-gray-600 mb-2">Pour raconter une expérience :</p>
-                     <div className="flex items-center gap-2 text-sm font-bold bg-gray-50 p-2 rounded border">
-                        <span className="text-blue-600">Contexte</span> ➡️ <span className="text-blue-600">Action (JE)</span> ➡️ <span className="text-green-600">Résultat</span>
-                     </div>
-                </div>
-                <div>
-                     <h3 className="font-bold text-lg mb-2">Après l'entretien</h3>
-                     <ul className="list-disc pl-5 text-sm space-y-1 text-gray-700">
-                        <li>Mail de remerciement (J+1 ou J+2).</li>
-                        <li>Rappelez votre motivation et un point clé.</li>
-                        <li>Pas de réponse ? <strong>Relancez !</strong></li>
-                     </ul>
-                </div>
-            </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h2 className="text-2xl font-bold text-[#0f1f41] mb-4 flex items-center gap-2"><Share className="text-green-600"/> Autres Ressources</h2>
-            <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500"/> <strong>LinkedIn :</strong> Créez un profil complet.</li>
-                <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500"/> <strong>Plateformes :</strong> Welcome to the Jungle, Indeed, MyJobGlasses, Wilbi.</li>
-                <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500"/> <strong>Cooptation :</strong> Contactez les alternants actuels via LinkedIn ou Datalumni.</li>
-            </ul>
         </div>
     </div>
 );
@@ -190,7 +159,7 @@ const TutosView = () => (
     <div className="max-w-3xl mx-auto space-y-8 animate-fadeIn">
         <div className="text-center mb-8">
             <h2 className="text-3xl font-extrabold text-[#0f1f41] mb-2">Installer l'Application</h2>
-            <p className="text-gray-600">Installez Suivi Alternance sur votre téléphone pour y accéder comme une vraie application (icône sur l'écran d'accueil).</p>
+            <p className="text-gray-600">Installez Suivi Alternance sur votre téléphone pour y accéder comme une vraie application.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -201,22 +170,10 @@ const TutosView = () => (
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-4">Sur Android (Chrome)</h3>
                 <ol className="text-left text-sm space-y-4 w-full px-4 text-gray-600">
-                    <li className="flex gap-3">
-                        <span className="bg-green-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                        <span>Ouvrez ce site dans <strong>Google Chrome</strong>.</span>
-                    </li>
-                    <li className="flex gap-3">
-                        <span className="bg-green-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                        <span>Appuyez sur les <strong>trois petits points (⋮)</strong> en haut à droite.</span>
-                    </li>
-                    <li className="flex gap-3">
-                        <span className="bg-green-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                        <span>Sélectionnez <strong>"Ajouter à l'écran d'accueil"</strong> ou "Installer l'application".</span>
-                    </li>
+                    <li className="flex gap-3"><span className="bg-green-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">1</span><span>Ouvrez ce site dans <strong>Google Chrome</strong>.</span></li>
+                    <li className="flex gap-3"><span className="bg-green-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">2</span><span>Appuyez sur les <strong>trois petits points (⋮)</strong> en haut à droite.</span></li>
+                    <li className="flex gap-3"><span className="bg-green-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">3</span><span>Sélectionnez <strong>"Ajouter à l'écran d'accueil"</strong>.</span></li>
                 </ol>
-                <div className="mt-6 p-3 bg-green-50 text-green-800 text-xs rounded-lg font-medium">
-                    L'icône "Suivi Alternance" apparaîtra sur votre téléphone !
-                </div>
             </div>
 
             {/* iOS */}
@@ -224,36 +181,19 @@ const TutosView = () => (
                 <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
                     <Smartphone size={32}/>
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Sur iPhone (Safari)</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Sur iPhone (Safari & Chrome)</h3>
                 <ol className="text-left text-sm space-y-4 w-full px-4 text-gray-600">
-                    <li className="flex gap-3">
-                        <span className="bg-blue-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                        <span>Ouvrez ce site dans <strong>Safari</strong> (obligatoire).</span>
-                    </li>
-                    <li className="flex gap-3">
-                        <span className="bg-blue-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                        <span>Appuyez sur le bouton <strong>Partager</strong> <Share size={12} className="inline"/> (carré avec flèche vers le haut).</span>
-                    </li>
-                    <li className="flex gap-3">
-                        <span className="bg-blue-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                        <span>Faites défiler vers le bas et appuyez sur <strong>"Sur l'écran d'accueil"</strong>.</span>
-                    </li>
+                    <li className="flex gap-3"><span className="bg-blue-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">1</span><span>Ouvrez ce site dans <strong>Safari</strong> ou <strong>Chrome</strong>.</span></li>
+                    <li className="flex gap-3"><span className="bg-blue-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">2</span><span>Appuyez sur l'icône <strong>Partager</strong> <Share size={12} className="inline"/> (carré avec flèche).</span></li>
+                    <li className="flex gap-3"><span className="bg-blue-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">3</span><span>Appuyez sur <strong>"Sur l'écran d'accueil"</strong>.</span></li>
                 </ol>
-                <div className="mt-6 p-3 bg-blue-50 text-blue-800 text-xs rounded-lg font-medium">
-                    L'icône sera ajoutée à côté de vos autres applications.
-                </div>
             </div>
-        </div>
-        
-        <div className="bg-gray-50 p-4 rounded-xl text-center border border-gray-200">
-            <h4 className="font-bold text-gray-700 flex items-center justify-center gap-2 mb-2"><Monitor size={18}/> Sur Ordinateur</h4>
-            <p className="text-sm text-gray-600">Vous pouvez aussi installer le site sur PC/Mac via Chrome en cliquant sur l'icône <Download size={12} className="inline"/> dans la barre d'adresse (à droite).</p>
         </div>
     </div>
 );
 
 // --- COMPOSANT : MODAL PROFIL & CV ---
-const ProfileModal = ({ onClose, profile, handleProfileUpload, email }) => {
+const ProfileModal = ({ onClose, profile, handleProfileUpload, email, isDemo }) => {
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
             <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
@@ -266,37 +206,16 @@ const ProfileModal = ({ onClose, profile, handleProfileUpload, email }) => {
                     <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                         <label className="text-xs font-bold text-blue-800 uppercase mb-1 block">Connecté en tant que</label>
                         <div className="font-medium text-lg text-blue-900 flex items-center gap-2">
-                            <Mail size={18}/> {email}
+                            <Mail size={18}/> {email} {isDemo && <span className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full ml-2">DEMO</span>}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
-                        {/* CV HUMAIN */}
                         <div className="border rounded-xl p-4 hover:bg-gray-50 transition-colors">
-                             <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-bold text-gray-700 flex items-center gap-2"><FileText className="text-orange-500"/> CV "Humain"</h3>
-                                {profile?.cv_human && <a href={profile.cv_human} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-sm flex items-center gap-1"><ExternalLink size={14}/> Voir</a>}
-                             </div>
-                             <div className="relative">
-                                <input type="file" onChange={(e) => handleProfileUpload(e.target.files[0], 'human')} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"/>
-                                <button className="w-full bg-white border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-lg text-sm font-medium hover:border-blue-500 hover:text-blue-500 transition-all flex justify-center items-center gap-2">
-                                    <Upload size={16}/> {profile?.cv_human ? "Remplacer le fichier" : "Importer mon CV (PDF)"}
-                                </button>
-                             </div>
-                        </div>
-
-                        {/* CV ATS */}
-                        <div className="border rounded-xl p-4 hover:bg-gray-50 transition-colors">
-                             <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-bold text-gray-700 flex items-center gap-2"><FileCheck className="text-green-600"/> CV "ATS" (Robot)</h3>
-                                {profile?.cv_ats && <a href={profile.cv_ats} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-sm flex items-center gap-1"><ExternalLink size={14}/> Voir</a>}
-                             </div>
-                             <div className="relative">
-                                <input type="file" onChange={(e) => handleProfileUpload(e.target.files[0], 'ats')} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"/>
-                                <button className="w-full bg-white border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-lg text-sm font-medium hover:border-blue-500 hover:text-blue-500 transition-all flex justify-center items-center gap-2">
-                                    <Upload size={16}/> {profile?.cv_ats ? "Remplacer le fichier" : "Importer version ATS"}
-                                </button>
-                             </div>
+                             <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-2"><FileText className="text-orange-500"/> CV "Humain"</h3>
+                             <button disabled={isDemo} className={`w-full border-2 border-dashed py-3 rounded-lg text-sm font-medium flex justify-center items-center gap-2 ${isDemo ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-500'}`}>
+                                <Upload size={16}/> {isDemo ? "Upload désactivé en démo" : "Importer mon CV (PDF)"}
+                             </button>
                         </div>
                     </div>
                 </div>
@@ -304,7 +223,6 @@ const ProfileModal = ({ onClose, profile, handleProfileUpload, email }) => {
         </div>
     );
 };
-
 
 // --- COMPOSANT : MODAL RGPD ---
 const LegalModal = ({ onClose, onExport, onDeleteAccount, isAuthScreen }) => (
@@ -356,7 +274,7 @@ const LegalModal = ({ onClose, onExport, onDeleteAccount, isAuthScreen }) => (
 );
 
 // --- COMPOSANT : ECRAN D'AUTHENTIFICATION ---
-const AuthScreen = ({ supabase }) => {
+const AuthScreen = ({ supabase, onStartDemo }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
@@ -380,7 +298,6 @@ const AuthScreen = ({ supabase }) => {
     <div className="min-h-screen bg-white flex flex-col md:flex-row font-sans">
       {/* Côté Gauche : Présentation */}
       <div className="md:w-1/2 bg-[#0f1f41] text-white p-8 md:p-12 flex flex-col justify-between relative overflow-hidden">
-        {/* Cercles déco arrière-plan */}
         <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
 
@@ -398,14 +315,8 @@ const AuthScreen = ({ supabase }) => {
             </h1>
             
             <div className="space-y-6 text-gray-300 text-lg">
-                <div className="flex items-start gap-4">
-                    <div className="bg-blue-500/20 p-2 rounded-lg mt-1"><CheckSquare size={20} className="text-blue-400"/></div>
-                    <p>Centralisez toutes vos offres (LinkedIn, Indeed, etc.) au même endroit.</p>
-                </div>
-                <div className="flex items-start gap-4">
-                    <div className="bg-purple-500/20 p-2 rounded-lg mt-1"><RefreshCw size={20} className="text-purple-400"/></div>
-                    <p>Gérez vos relances et votre routine de recherche quotidienne.</p>
-                </div>
+                <div className="flex items-start gap-4"><div className="bg-blue-500/20 p-2 rounded-lg mt-1"><CheckSquare size={20} className="text-blue-400"/></div><p>Centralisez toutes vos offres (LinkedIn, Indeed, etc.).</p></div>
+                <div className="flex items-start gap-4"><div className="bg-purple-500/20 p-2 rounded-lg mt-1"><RefreshCw size={20} className="text-purple-400"/></div><p>Gérez vos relances et votre routine de recherche.</p></div>
             </div>
         </div>
 
@@ -425,31 +336,20 @@ const AuthScreen = ({ supabase }) => {
                 <p className="text-gray-500 text-sm mt-2">{isSignUp ? "Commencez votre recherche organisée." : "Connectez-vous pour voir vos tableaux."}</p>
             </div>
 
-            {message && (
-                <div className={`mb-4 p-3 rounded-lg text-sm text-center ${message.includes('créé') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-                    {message}
-                </div>
-            )}
+            {message && <div className={`mb-4 p-3 rounded-lg text-sm text-center ${message.includes('créé') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>{message}</div>}
 
             <form onSubmit={handleAuth} className="space-y-5">
-                <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Email</label>
-                    <input type="email" className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-base" placeholder="exemple@email.com" value={email} onChange={e => setEmail(e.target.value)} required />
-                </div>
-                <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Mot de passe</label>
-                    <input type="password" className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-base" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
-                </div>
-                <button disabled={loading} className="w-full bg-[#005792] hover:bg-[#004270] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/10 text-base flex justify-center items-center gap-2">
-                    {loading ? <RefreshCw className="animate-spin" size={20}/> : (isSignUp ? "S'inscrire gratuitement" : "Se connecter")}
-                </button>
+                <div><label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Email</label><input type="email" className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-base" placeholder="exemple@email.com" value={email} onChange={e => setEmail(e.target.value)} required /></div>
+                <div><label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Mot de passe</label><input type="password" className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-base" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required /></div>
+                <button disabled={loading} className="w-full bg-[#005792] hover:bg-[#004270] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/10 text-base flex justify-center items-center gap-2">{loading ? <RefreshCw className="animate-spin" size={20}/> : (isSignUp ? "S'inscrire gratuitement" : "Se connecter")}</button>
             </form>
             
-            <div className="mt-8 text-center pt-6 border-t border-gray-100">
-                <p className="text-gray-500 text-sm mb-2">{isSignUp ? "Déjà membre ?" : "Pas encore de compte ?"}</p>
-                <button onClick={() => setIsSignUp(!isSignUp)} className="text-blue-600 font-bold hover:underline transition-all">
-                    {isSignUp ? "Se connecter" : "Créer un compte"}
-                </button>
+            <div className="mt-6 flex flex-col gap-4">
+                <button onClick={onStartDemo} className="w-full bg-white border border-gray-300 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-2"><Eye size={18}/> Accéder à la Démo (Sans compte)</button>
+                <div className="text-center pt-2 border-t border-gray-100">
+                    <p className="text-gray-500 text-sm mb-2">{isSignUp ? "Déjà membre ?" : "Pas encore de compte ?"}</p>
+                    <button onClick={() => setIsSignUp(!isSignUp)} className="text-blue-600 font-bold hover:underline transition-all">{isSignUp ? "Se connecter" : "Créer un compte"}</button>
+                </div>
             </div>
         </div>
       </div>
@@ -466,10 +366,9 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [showLegal, setShowLegal] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [isDemo, setIsDemo] = useState(false);
   
-  // NOUVEAU : GESTION DES VUES (ONGLETS)
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'conseils', 'tutos'
-
+  const [currentView, setCurrentView] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("date_desc"); 
   const [viewMode, setViewMode] = useState("list"); 
@@ -484,7 +383,7 @@ const App = () => {
   });
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase || isDemo) return;
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session); if (session) fetchData(); else setLoading(false);
     });
@@ -492,7 +391,7 @@ const App = () => {
       setSession(session); if (session) fetchData(); else setLoading(false);
     });
     return () => subscription.unsubscribe();
-  }, []);
+  }, [isDemo]);
 
   const fetchData = async () => {
     try {
@@ -501,15 +400,20 @@ const App = () => {
       setApplications(apps || []);
       const { data: prof } = await supabase.from('profile').select('*').limit(1).maybeSingle();
       if (prof) setProfile(prof);
-      // Création auto du profil s'il n'existe pas
-      if (!prof && session) {
-         await supabase.from('profile').insert([{ id: session.user.id }]).select();
-      }
+      if (!prof && session) await supabase.from('profile').insert([{ id: session.user.id }]).select();
     } catch (e) { console.error(e); } 
     finally { setLoading(false); }
   };
 
+  const startDemo = () => {
+      setIsDemo(true);
+      setSession({ user: { email: "visiteur@demo.com" } });
+      setApplications(DEMO_DATA);
+      setLoading(false);
+  };
+
   const handleProfileUpload = async (file, type) => {
+    if (isDemo) return alert("Fonctionnalité désactivée en mode démo.");
     if (!file) return;
     setUploading(true);
     const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
@@ -519,22 +423,19 @@ const App = () => {
       const updateData = type === 'ats' ? { cv_ats: data.publicUrl } : { cv_human: data.publicUrl };
       await supabase.from('profile').update(updateData).gt('id', 0);
       setProfile(prev => ({ ...prev, ...updateData }));
-    } else {
-        alert("Erreur upload: " + upErr.message);
-    }
+    } else alert("Erreur upload: " + upErr.message);
     setUploading(false);
   };
 
-  // --- LOGIQUE ANTI-DOUBLON ---
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isDemo) return alert("En mode démo, les modifications ne sont pas enregistrées.");
+    
     const normalize = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
     const cleanCompany = normalize(newApp.company);
     const isDuplicate = applications.some(app => app.id !== editingId && normalize(app.company) === cleanCompany);
 
-    if (isDuplicate) {
-        if (!window.confirm(`⚠️ Attention : Vous avez déjà une candidature pour "${newApp.company}". Voulez-vous quand même l'ajouter ?`)) return;
-    }
+    if (isDuplicate && !window.confirm(`⚠️ Doublon : Vous avez déjà une candidature pour "${newApp.company}". Ajouter quand même ?`)) return;
 
     setUploading(true);
     if (editingId) {
@@ -549,6 +450,7 @@ const App = () => {
   };
 
   const handleDelete = async (id) => {
+    if (isDemo) return alert("Suppression désactivée en mode démo.");
     if (window.confirm("Supprimer ?")) {
       await supabase.from('applications').delete().eq('id', id);
       setApplications(prev => prev.filter(a => a.id !== id));
@@ -556,12 +458,14 @@ const App = () => {
   };
 
   const toggleRelance = async (app) => {
+    if (isDemo) return; 
     const newVal = !app.relanceDone;
     setApplications(prev => prev.map(a => a.id === app.id ? { ...a, relanceDone: newVal } : a));
     await supabase.from('applications').update({ relanceDone: newVal }).eq('id', app.id);
   };
 
   const toggleFavorite = async (app) => {
+    if (isDemo) return;
     const newVal = !app.isFavorite;
     setApplications(prev => prev.map(a => a.id === app.id ? { ...a, isFavorite: newVal } : a));
     await supabase.from('applications').update({ isFavorite: newVal }).eq('id', app.id);
@@ -594,20 +498,19 @@ const App = () => {
         if (sortType === 'source') return (a.source || "").localeCompare(b.source || ""); 
         if (sortType === 'favorite') return (b.isFavorite === true) - (a.isFavorite === true);
         if (sortType === 'alpha') return a.company.localeCompare(b.company);
-        if (sortType === 'date_asc') return new Date(a.date) - new Date(b.date);
-        return new Date(b.date) - new Date(a.date);
+        if (sortType === 'date_asc') return new Date(a.date) - new Date(b.date); // TRI PLUS ANCIEN
+        return new Date(b.date) - new Date(a.date); // TRI PAR DEFAUT (RECENT)
     });
 
-  // Helper pour savoir si on attend un email ou un lien
   const isDirectContact = newApp.source === 'Contact direct';
 
-  if (!session) return <AuthScreen supabase={supabase} />;
+  if (!session) return <AuthScreen supabase={supabase} onStartDemo={startDemo} />;
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] text-slate-800 font-sans flex flex-col">
       <div className="max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6 flex-1">
         
-        {/* HEADER NAVIGATION */}
+        {/* HEADER */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-2 z-40">
           <div className="flex items-center gap-4 w-full md:w-auto">
              <div className="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden relative border border-gray-100">
