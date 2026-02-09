@@ -211,7 +211,7 @@ const ProfileModal = ({ onClose, profile, handleProfileUpload, email, isDemo }) 
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
-                        {/* CV HUMAIN - RESTAURÉ */}
+                        {/* CV HUMAIN */}
                         <div className="border rounded-xl p-4 hover:bg-gray-50 transition-colors">
                              <div className="flex justify-between items-start mb-3">
                                 <h3 className="font-bold text-gray-700 flex items-center gap-2"><FileText className="text-orange-500"/> CV "Humain"</h3>
@@ -225,7 +225,7 @@ const ProfileModal = ({ onClose, profile, handleProfileUpload, email, isDemo }) 
                              </div>
                         </div>
 
-                        {/* CV ATS - RESTAURÉ */}
+                        {/* CV ATS */}
                         <div className="border rounded-xl p-4 hover:bg-gray-50 transition-colors">
                              <div className="flex justify-between items-start mb-3">
                                 <h3 className="font-bold text-gray-700 flex items-center gap-2"><FileCheck className="text-green-600"/> CV "ATS" (Robot)</h3>
@@ -498,6 +498,51 @@ const App = () => {
       formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // --- CORRECTION CSV EXPORT ---
+  const exportToCSV = () => {
+    // 1. En-tête UTF-8 pour Excel
+    const BOM = "\uFEFF"; 
+    const headers = ["Entreprise", "Poste", "Statut", "Source", "Lien/Email", "Date", "Relance Faite"];
+    
+    // 2. Formatage sécurisé des données (échapper les guillemets et gérer les nuls)
+    const rows = applications.map(app => [
+      `"${String(app.company || '').replace(/"/g, '""')}"`,
+      `"${String(app.role || '').replace(/"/g, '""')}"`,
+      `"${String(app.status || '').replace(/"/g, '""')}"`,
+      `"${String(app.source || '').replace(/"/g, '""')}"`,
+      `"${String(app.application_url || app.contact_email || '').replace(/"/g, '""')}"`,
+      `"${String(app.date || '').replace(/"/g, '""')}"`,
+      `"${app.relanceDone ? 'Oui' : 'Non'}"`
+    ]);
+    
+    // 3. Construction du contenu
+    const csvContent = headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
+    
+    // 4. Création du Blob (Le fix !)
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    // 5. Déclenchement du téléchargement
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "mes_candidatures.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const deleteAccountData = async () => {
+    if (isDemo) return alert("Impossible en mode démo.");
+    setLoading(true);
+    await supabase.from('applications').delete().neq('id', 0);
+    await supabase.from('profile').delete().neq('id', 0);
+    await supabase.auth.signOut();
+    setSession(null);
+    setLoading(false);
+    setShowLegal(false);
+    alert("Compte et données supprimés.");
+  };
+
   const resetForm = () => { 
     setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], relanceDone: false, isFavorite: false }); 
     setEditingId(null); 
@@ -696,7 +741,7 @@ const App = () => {
       </footer>
 
       {/* MODALS */}
-      {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={() => {}} onDeleteAccount={() => {}} />}
+      {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={exportToCSV} onDeleteAccount={deleteAccountData} />}
       {showProfile && <ProfileModal onClose={() => setShowProfile(false)} profile={profile} handleProfileUpload={handleProfileUpload} email={session.user.email} isDemo={isDemo} />}
     </div>
   );
